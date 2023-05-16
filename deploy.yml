@@ -1,0 +1,21 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # provision ecr's through terraform
+  build-containers:
+    name: dockerises pipeline and pushes to ecr
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: dockerise
+        working-directory: etl
+        run: |
+          docker build -t ECR_NAME .
+          docker tag ECR_NAME:latest 605126261673.dkr.ecr.eu-west-2.amazonaws.com/ECR_NAME:latest
+          docker push 605126261673.dkr.ecr.eu-west-2.amazonaws.com/ECR_NAME:latest
+
+  deploy-cloud-infrastructure:
+    name: provisions cloud infrastructure deploys pipeline to AWS
