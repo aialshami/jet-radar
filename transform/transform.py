@@ -30,18 +30,19 @@ def load_airport_locations(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dic
     """Returns a dictionary with airport codes as keys and the location of the 
     airport in a latitude, longitude tuple as values. Expects a file path as input."""
 
-    with open(data_file_path) as f:
+    with open(data_file_path, encoding="utf-8") as f:
         airport_data = json.load(f)
 
-    return {airport["iata"]: (float(airport["lat"]), float(airport["lon"]))
-            for airport in airport_data 
+    return {airport["iata"]: airport for airport in airport_data 
             if "lat" in airport and "lon" in airport}
 
 
 def load_aircraft_info(data_file_path: str = AIRCRAFT_INFO_JSON_FILE_PATH) -> dict[dict]:
+    """Returns data on aircraft models including the name, fuel consumption and category as 
+    a dictionary of dictionaries. Expects a file path as input."""
 
-    with open(data_file_path) as f:
-        aircraft_data = json.load(f)
+    with open(data_file_path, encoding="utf-8") as f:
+        return json.load(f)
 
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -62,7 +63,8 @@ def find_nearest_airport(lat: float, lon: float, airport_locations: dict) -> str
     """Finds closest airport to input latitude and longitude and returns the airport IATA code and
     location. Expects latitude and longitude as floats and a dictionary of airport locations."""
 
-    return sorted(airport_locations.items(), key=lambda x: haversine_distance(*x[1], lat, lon))[0]
+    return sorted(airport_locations.items(),
+                  key=lambda x: haversine_distance(float(x[1]["lat"]), float(x[1]["lon"]), lat, lon))[0]
 
 
 def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_model: str,
@@ -76,6 +78,8 @@ def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_
     fuel_consumption_rate = aircraft_info[aircraft_model]["galph"]
 
     return flight_duration_hours * fuel_consumption_rate
+
+
 
 
 if __name__ == "__main__":
