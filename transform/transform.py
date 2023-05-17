@@ -1,9 +1,10 @@
 import json
-from math import sin, cos, acos, asin, sqrt, pi
+from math import sin, cos, acos, pi
+from datetime import datetime, timedelta
 
 
 AIRPORTS_JSON_FILE_PATH = "./airports.json"
-AIRCRAFT_FUEL_CONSUMPTION_JSON_FILE_PATH = "./aircraft_fuel_consumption_rates.json"
+AIRCRAFT_INFO_JSON_FILE_PATH = "./aircraft_fuel_consumption_rates.json"
 
 
 def load_airport_locations(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dict:
@@ -18,7 +19,7 @@ def load_airport_locations(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dic
             if "lat" in airport and "lon" in airport}
 
 
-def load_aircraft_fuel_consumption_rates(data_file_path: str = AIRCRAFT_FUEL_CONSUMPTION_JSON_FILE_PATH) -> dict:
+def load_aircraft_info(data_file_path: str = AIRCRAFT_INFO_JSON_FILE_PATH) -> dict[dict]:
 
     with open(data_file_path) as f:
         aircraft_data = json.load(f)
@@ -39,10 +40,23 @@ def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
 
 
 def find_nearest_airport(lat: float, lon: float, airport_locations: dict) -> str:
-    """Finds closest airport to input latitude and longitude and returns the airport IATA code as a string.
-    Expects latitude and longitude as floats and a dictionary of airport locations."""
+    """Finds closest airport to input latitude and longitude and returns the airport IATA code and
+    location. Expects latitude and longitude as floats and a dictionary of airport locations."""
 
-    return sorted(airport_locations.items(), key=lambda x: haversine_distance(*x[1], lat, lon))[0][0]
+    return sorted(airport_locations.items(), key=lambda x: haversine_distance(*x[1], lat, lon))[0]
+
+
+def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_model: str,
+                               aircraft_info: dict[dict]) -> float:
+    """Calculates fuel consumption by multiplying the flight duration in hours by the estimated 
+    fuel consumption of the aircraft. Returns this as a float in gallons (galph = gallons per hour). 
+    Expects departure/arrival times as datetimes, the aircraft model code and aircraft info.
+    """
+
+    flight_duration_hours = (arr_time - dep_time).hours
+    fuel_consumption_rate = aircraft_info[aircraft_model]["galph"]
+
+    return flight_duration_hours * fuel_consumption_rate
 
 
 if __name__ == "__main__":
