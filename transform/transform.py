@@ -25,9 +25,9 @@ def load_aircraft_fuel_consumption_rates(data_file_path: str = AIRCRAFT_FUEL_CON
 
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Calculates distance between two locations. The latitudes and longitudes are 
+    """Calculates distance in km between two locations. The latitudes and longitudes are 
     converted to radians and the distance is calculated using the Haversine formula. 
-    r is the radius of the earth."""
+    r is the radius of the earth. Expects floats and returns a float."""
 
     r = 6371
     lat1_rad = lat1 * pi/180
@@ -39,9 +39,13 @@ def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
 
 
 def find_nearest_airport(lat: float, lon: float, airport_locations: dict) -> str:
-    pass
+    """Finds closest airport to input latitude and longitude and returns the airport IATA code as a string.
+    Expects latitude and longitude as floats and a dictionary of airport locations."""
+
+    return sorted(airport_locations.items(), key=lambda x: haversine_distance(*x[1], lat, lon))[0][0]
 
 
 if __name__ == "__main__":
 
-    print(haversine_distance(40.7486, 62.5, 21.89, 86))
+    airport_locations = load_airport_locations()
+    print(find_nearest_airport(52, 13.7, airport_locations))
