@@ -1,16 +1,37 @@
-DROP TABLE IF EXISTS "flight";
-DROP TABLE IF EXISTS "owner_role_link";
-DROP TABLE IF EXISTS "aircraft";
-DROP TABLE IF EXISTS "model";
-DROP TABLE IF EXISTS "owner";
-DROP TABLE IF EXISTS "gender";
-DROP TABLE IF EXISTS "job_role";
-DROP TABLE IF EXISTS "gender";
-DROP TABLE IF EXISTS "airport";
-DROP TABLE IF EXISTS "country";
-DROP TABLE IF EXISTS "continent";
+-- Drop schemas if they exist (DEVELOPMENT)
+DROP SCHEMA IF EXISTS staging CASCADE;
+DROP SCHEMA IF EXISTS production CASCADE;
+
+-- Create schemas
+CREATE SCHEMA staging;
+CREATE SCHEMA production;
+
+-- Select staging schema
+SET search_path TO staging;
+
+-- Build staging schema tables
+CREATE TABLE "tracked_event"(
+    "event_id" INTEGER GENERATED ALWAYS AS IDENTITY,
+    "time_input" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "flight_no" VARCHAR(10) NOT NULL,
+    "aircraft_reg" VARCHAR(10) NOT NULL,
+    "model" VARCHAR(10) NOT NULL,
+    "borometric_alt" INTEGER NOT NULL,
+    "geometric_alt" INTEGER NOT NULL,
+    "ground_speed" FLOAT NOT NULL,
+    "true_track" FLOAT NOT NULL,
+    "barometric_alt_roc" FLOAT NOT NULL,
+    "emergency" TEXT NOT NULL,
+    "lat" FLOAT NOT NULL,
+    "lon" FLOAT NOT NULL,
+    PRIMARY KEY("event_id")
+   );
 
 
+-- Select production schema
+SET search_path TO production;
+
+-- Build production schema tables
 CREATE TABLE IF NOT EXISTS "emergency"(
     "emergency_id" INTEGER GENERATED ALWAYS AS IDENTITY,
     "type" VARCHAR(20) NOT NULL UNIQUE,
