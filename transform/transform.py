@@ -17,10 +17,11 @@ def load_airport_locations(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dic
 
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculates distance between two locations """
     pass
 
 
-def find_nearest_airport(lat: float, lon: float, airport_locations: dict):
+def find_nearest_airport(lat: float, lon: float, airport_locations: dict) -> str:
     pass
 
 
