@@ -1,0 +1,7 @@
+requests
+urllib3==1.26.6
+psycopg2-binary
+python-dotenv
+sqlalchemy
+pandas
+boto3
