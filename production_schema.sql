@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS "flights";
+DROP TABLE IF EXISTS "flight";
 DROP TABLE IF EXISTS "owner_role_link";
 DROP TABLE IF EXISTS "aircraft";
 DROP TABLE IF EXISTS "model";
@@ -10,6 +10,12 @@ DROP TABLE IF EXISTS "airport";
 DROP TABLE IF EXISTS "country";
 DROP TABLE IF EXISTS "continent";
 
+
+CREATE TABLE IF NOT EXISTS "emergency"(
+    "emergency_id" INTEGER GENERATED ALWAYS AS IDENTITY,
+    "type" VARCHAR(20) NOT NULL UNIQUE,
+    PRIMARY KEY("emergency_id")
+);
 
 CREATE TABLE IF NOT EXISTS "gender"(
     "gender_id" INTEGER GENERATED ALWAYS AS IDENTITY,
@@ -54,7 +60,7 @@ CREATE TABLE IF NOT EXISTS "airport"(
     PRIMARY KEY("airport_id")
 );
 
-CREATE TABLE IF NOT EXISTS "flights"(
+CREATE TABLE IF NOT EXISTS "flight"(
     "flight_id" INTEGER GENERATED ALWAYS AS IDENTITY,
     "flight_number" VARCHAR(10) NOT NULL,
     "dep_airport_id" INTEGER NOT NULL,
@@ -62,6 +68,7 @@ CREATE TABLE IF NOT EXISTS "flights"(
     "dep_time" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
     "arr_time" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
     "aircraft_id" INTEGER NOT NULL,
+    "emergency_id" INTEGER NOT NULL,
     PRIMARY KEY("flight_id")
 );
 
@@ -97,11 +104,13 @@ ALTER TABLE
 ALTER TABLE
     "owner" ADD CONSTRAINT "owner_gender_id_foreign" FOREIGN KEY("gender_id") REFERENCES "gender"("gender_id");
 ALTER TABLE
-    "flights" ADD CONSTRAINT "flights_arr_airport_id_foreign" FOREIGN KEY("arr_airport_id") REFERENCES "airport"("airport_id");
+    "flight" ADD CONSTRAINT "flight_arr_airport_id_foreign" FOREIGN KEY("arr_airport_id") REFERENCES "airport"("airport_id");
 ALTER TABLE
-    "flights" ADD CONSTRAINT "flights_dep_airport_id_foreign" FOREIGN KEY("dep_airport_id") REFERENCES "airport"("airport_id");
+    "flight" ADD CONSTRAINT "flight_dep_airport_id_foreign" FOREIGN KEY("dep_airport_id") REFERENCES "airport"("airport_id");
 ALTER TABLE
-    "flights" ADD CONSTRAINT "flights_aircraft_id_foreign" FOREIGN KEY("aircraft_id") REFERENCES "aircraft"("aircraft_id");
+    "flight" ADD CONSTRAINT "flight_aircraft_id_foreign" FOREIGN KEY("aircraft_id") REFERENCES "aircraft"("aircraft_id");
+ALTER TABLE
+    "flight" ADD CONSTRAINT "flight_emergency_id_foreign" FOREIGN KEY("emergency_id") REFERENCES "emergency"("emergency_id");
 ALTER TABLE
     "country" ADD CONSTRAINT "country_continent_id_foreign" FOREIGN KEY("continent_id") REFERENCES "continent"("continent_id");
 ALTER TABLE
