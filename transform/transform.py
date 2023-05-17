@@ -1,10 +1,29 @@
 import json
+import os
 from math import sin, cos, acos, pi
-from datetime import datetime, timedelta
+from datetime import datetime
+import psycopg2
+import psycopg2.extras
+from psycopg2.extensions import connection
+from dotenv import load_dotenv
 
 
 AIRPORTS_JSON_FILE_PATH = "./airports.json"
 AIRCRAFT_INFO_JSON_FILE_PATH = "./aircraft_fuel_consumption_rates.json"
+
+
+load_dotenv()
+config = os.environ
+
+
+def get_db_connection() -> connection:
+    """Establishes connection to database. Returns psycopg2 connection object."""
+
+    return psycopg2.connect(user = config["DATABASE_USERNAME"],
+                            password = config["DATABASE_PASSWORD"],
+                            host = config["DATABASE_IP"],
+                            port = config["DATABASE_PORT"],
+                            database = config["DATABASE_NAME"])
 
 
 def load_airport_locations(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dict:
