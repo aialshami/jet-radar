@@ -140,28 +140,45 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     curs = conn.cursor(cursor_factory=RealDictCursor)
     cc = coco.CountryConverter()
 
+    continent_codes = {"Asia": "AS", "Europe": "EU", "Africa": "AF", "Oceania": "OC", "America": "AM"}
+
     for airport in airport_info:
         name = airport_info[airport]["name"]
         iata = airport_info[airport]["iata"]
         lat = airport_info[airport]["lat"]
         lon = airport_info[airport]["lon"]
-        country_code = airport_info[airport]["iso"]
-        country = cc.convert(names=country_code, to="name_short")
-        continent = cc.convert(names=country_code, to="continent")
+        try:
+            country = airport_info[airport]["iso"]
+            country_name = cc.convert(names=country, to="name_short")
+            continent_name = cc.convert(names=country, to="continent")
+            continent = continent_codes[continent_name]
+        except Exception:
+            continue
 
-        curs.execute("SELECT country_id FROM country WHERE country_name = %s", (country,))
+        curs.execute("SELECT country_id FROM country WHERE code = %s", (country,))
         country_id = curs.fetchall()
+
         if not country_id:
-            curs.execute("SELECT continent_id FROM continent WHERE continent_name = %s", (continent,))
+            curs.execute("SELECT continent_id FROM continent WHERE code = %s", (continent,))
             continent_id = curs.fetchall()
+
             if not continent_id:
-                curs.execute("INSERT INTO continent (continent_name) VALUES (%s) RETURNING continent_id", (continent,))
-                continent_id = curs.fetchall()
-            curs.execute("INSERT INTO country (country_name, continent_id) %s RETURNING country_id", (country, continent_id))
-            country_id = curs.fetchall()
+                curs.execute("INSERT INTO continent (code, name) VALUES (%s, %s) RETURNING continent_id",
+                             (continent, continent_name))
+                continent_id = dict(curs.fetchall()[0])["continent_id"]
+
+            else:
+                continent_id = dict(continent_id[0])["continent_id"]
+
+            curs.execute("INSERT INTO country (code, name, continent_id) VALUES (%s, %s, %s) RETURNING country_id",
+                         (country, country_name, continent_id))
+            country_id = dict(curs.fetchall()[0])["country_id"]
+        else:
+            country_id = dict(country_id[0])["country_id"]
+
         curs.execute("INSERT INTO airport (name, iata, lat, lon, country_id) VALUES (%s, %s, %s, %s, %s)",
                      (name, iata, lat, lon, country_id))
-
+    # REMEMBER TO COMMIT
 
 
 
@@ -180,6 +197,14 @@ if __name__ == "__main__":
         arr_airport = find_nearest_airport(*arr_location, airport_info)
         if dep_airport == arr_airport: continue"""
     
-        
+    insert_airport_info(production_conn, airport_info)
+
+    with production_conn.cursor(cursor_factory=RealDictCursor) as curs:
+        curs.execute("SELECT * FROM continent;")
+        print(curs.fetchall())
+        curs.execute("SELECT * FROM country LIMIT 10;")
+        print(curs.fetchall())
+        curs.execute("SELECT * FROM airport LIMIT 10;")
+        print(curs.fetchall())
    
         
