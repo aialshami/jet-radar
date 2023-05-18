@@ -59,18 +59,32 @@ def get_flight_params(flight: dict) -> list:
     """ extracts staging data from API info """
     flight_data:dict = {}
 
+    flight_info = flight["ac"][0]
     flight_data["time_input"] = datetime.utcfromtimestamp(flight["now"]/1000)
-    flight_data["flight_no"] = flight["ac"][0]["flight"]
-    flight_data["aircraft_reg"] = flight["ac"][0]["r"]
-    flight_data["model"] = flight["ac"][0]["t"]
-    flight_data["barometric_alt"] = flight["ac"][0]["alt_baro"]
-    flight_data["geometric_alt"] = flight["ac"][0]["alt_geom"]
-    flight_data["ground_speed"] = flight["ac"][0]["gs"]
-    flight_data["true_track"] = flight["ac"][0]["track"]
-    flight_data["barometric_alt_roc"] = flight["ac"][0]["baro_rate"]
-    flight_data["emergency"] = flight["ac"][0]["emergency"]
-    flight_data["lat"] = flight["ac"][0]["lat"]
-    flight_data["lon"] = flight["ac"][0]["lon"]
+    
+    for key in flight_info.keys():
+        if key == "flight":
+            flight_data["flight_no"] = flight_info["flight"]
+        elif key == "r":
+            flight_data["aircraft_reg"] = flight_info["r"]
+        elif key == "t":
+            flight_data["model"] = flight_info["t"]
+        elif key == "alt_baro":
+            flight_data["barometric_alt"] = flight_info["alt_baro"]
+        elif key == "alt_geom":
+            flight_data["geometric_alt"] = flight_info["alt_geom"]
+        elif key == "gs":
+            flight_data["ground_speed"] = flight_info["gs"]
+        elif key == "track":
+            flight_data["true_track"] = flight_info["track"]
+        elif key == "baro_rate":
+            flight_data["barometric_alt_roc"] = flight_info["baro_rate"]
+        elif key == "emergency":
+            flight_data["emergency"] = flight_info["emergency"]
+        elif key == "lat":
+            flight_data["lat"] = flight_info["lat"]
+        elif key == "lon":
+            flight_data["lon"] = flight_info["lon"]
 
     return flight_data
 
@@ -88,4 +102,3 @@ def handler(event, context) -> None:
 
     # Pushes to staging DB
     push_to_staging_database(config, flight_df)
-
