@@ -14,10 +14,10 @@ class SQL():
         self.engine = self.create_engine(config["DB_HOST"], config["DB_USER"],
                                          config["DB_PASSWORD"], config["DB_NAME"])
 
-    def write_df_to_table(self, data: DataFrame, table:str, schema:str, if_exists:str='replace'):
+    def write_df_to_table(self, data: DataFrame, table:str, schema:str, if_exists:str='append'):
         """ Writes a given DataFrame to an SQL table and schema """
         data.to_sql(name=table, con=self.engine.connect(), schema=schema,
-                    if_exists=if_exists, index=False)
+                    if_exists='append', index=False)
 
 
     def create_engine(self, host, username, password, db_name) -> Engine:
