@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Generator
 import country_converter as coco
 import psycopg2
-from psycopg2.extras import execute_values, RealDictCursor
+from psycopg2.extras import RealDictCursor
 from psycopg2.extensions import connection
 from dotenv import load_dotenv
 import pandas as pd
@@ -86,7 +86,8 @@ def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_
 
 
 def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
-    """"""
+    """Parses events from staging db and extracts flight number, tail number, departure time/location
+    and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
     df = pd.read_sql("SELECT * FROM tracked_event;", conn)
 
@@ -136,6 +137,8 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
 
 
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
+    """Inserts airport data into production db and populates country/ continent tables.
+    Expects the production db connection object and the airport data."""
     
     curs = conn.cursor(cursor_factory=RealDictCursor)
     cc = coco.CountryConverter()
@@ -179,6 +182,10 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         curs.execute("INSERT INTO airport (name, iata, lat, lon, country_id) VALUES (%s, %s, %s, %s, %s)",
                      (name, iata, lat, lon, country_id))
     # REMEMBER TO COMMIT
+
+
+def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info) -> None:
+    pass
 
 
 
