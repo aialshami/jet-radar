@@ -3,8 +3,9 @@ import os
 from math import sin, cos, acos, pi
 from datetime import datetime
 from typing import Generator
+import country_converter as coco
 import psycopg2
-import psycopg2.extras
+from psycopg2.extras import execute_values, RealDictCursor
 from psycopg2.extensions import connection
 from dotenv import load_dotenv
 import pandas as pd
@@ -30,7 +31,7 @@ def get_db_connection(schema: str) -> connection:
                             options = f"-c search_path={schema}")
 
 
-def load_airport_info(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dict:
+def load_airport_info(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dict[dict]:
     """Returns a dictionary with airport codes as keys and the location of the 
     airport in a latitude, longitude tuple as values. Expects a file path as input."""
 
@@ -134,6 +135,34 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
                 dep_location = (current_event["lat"], current_event["lon"])
 
 
+def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
+    
+    curs = conn.cursor(cursor_factory=RealDictCursor)
+    cc = coco.CountryConverter()
+
+    for airport in airport_info:
+        name = airport_info[airport]["name"]
+        iata = airport_info[airport]["iata"]
+        lat = airport_info[airport]["lat"]
+        lon = airport_info[airport]["lon"]
+        country_code = airport_info[airport]["iso"]
+        country = cc.convert(names=country_code, to="name_short")
+        continent = cc.convert(names=country_code, to="continent")
+
+        curs.execute("SELECT country_id FROM country WHERE country_name = %s", (country,))
+        country_id = curs.fetchall()
+        if not country_id:
+            curs.execute("SELECT continent_id FROM continent WHERE continent_name = %s", (continent,))
+            continent_id = curs.fetchall()
+            if not continent_id:
+                curs.execute("INSERT INTO continent (continent_name) VALUES (%s) RETURNING continent_id", (continent,))
+                continent_id = curs.fetchall()
+            curs.execute("INSERT INTO country (country_name, continent_id) %s RETURNING country_id", (country, continent_id))
+            country_id = curs.fetchall()
+        curs.execute("INSERT INTO airport (name, iata, lat, lon, country_id) VALUES (%s, %s, %s, %s, %s)",
+                     (name, iata, lat, lon, country_id))
+
+
 
 
 if __name__ == "__main__":
@@ -144,11 +173,13 @@ if __name__ == "__main__":
     staging_conn = get_db_connection("staging")
     production_conn = get_db_connection("production")
 
-    for flight in extract_todays_flights(staging_conn):
+    """for flight in extract_todays_flights(staging_conn):
         jet, flight_no, dep_time, dep_location, arr_time, arr_location = flight
         
         dep_airport = find_nearest_airport(*dep_location, airport_info)
         arr_airport = find_nearest_airport(*arr_location, airport_info)
-        if dep_airport == arr_airport: continue
-
+        if dep_airport == arr_airport: continue"""
+    
+        
+   
         
