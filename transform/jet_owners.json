@@ -1,0 +1,96 @@
+[
+  {
+    "name": "Elon Musk",
+    "gender": "M",
+    "est_net_worth": 180700000000,
+    "job_role": ["CEO", "Businessman"],
+    "tail_number": "N628TS",
+    "aircraft_model": "GLF6"
+  },
+  {
+    "name": "Tom Cruise",
+    "gender": "M",
+    "est_net_worth": 600000000,
+    "job_role": ["Actor", "Producer"],
+    "tail_number": "N350XX",
+    "aircraft_model": "CL30"
+  },
+  {
+    "name": "Oprah Winfrey",
+    "gender": "F",
+    "est_net_worth": 2500000000,
+    "job_role": [
+      "Talk Show Host",
+      "Journalist",
+      "Author",
+      "Producer",
+      "Businesswoman"
+    ],
+    "tail_number": "N540W",
+    "aircraft_model": "GLF6"
+  },
+  {
+    "name": "Floyd Mayweather",
+    "gender": "M",
+    "est_net_worth": 450000000,
+    "job_role": ["Boxer", "Promoter"],
+    "tail_number": "N151SD",
+    "aircraft_model": "GLF4"
+  },
+  {
+    "name": "Taylor Swift",
+    "gender": "F",
+    "est_net_worth": 2500000000,
+    "job_role": ["Singer", "Record Producer"],
+    "tail_number": "N898TS",
+    "aircraft_model": "F900"
+  },
+  {
+    "name": "Bill Gates",
+    "gender": "M",
+    "est_net_worth": 113900000000,
+    "job_role": ["Businessman"],
+    "tail_number": "N887WM",
+    "aircraft_model": "GLF6"
+  },
+  {
+    "name": "Bill Gates",
+    "gender": "M",
+    "est_net_worth": 113900000000,
+    "job_role": ["Businessman"],
+    "tail_number": "N194WM",
+    "aircraft_model": "GLF6"
+  },
+  {
+    "name": "Kim Kardashian",
+    "gender": "F",
+    "est_net_worth": 1200000000,
+    "job_role": ["Model", "Influencer", "Businesswoman", "TV Personality"],
+    "tail_number": "N1980K",
+    "aircraft_model": "GLF6"
+  },
+  {
+    "name": "Travis Scott",
+    "gender": "M",
+    "est_net_worth": 80000000,
+    "job_role": ["Singer", "Rapper", "Record Producer"],
+    "tail_number": "N713TS",
+    "aircraft_model": "E190"
+  },
+  {
+    "name": "Kylie Jenner",
+    "gender": "F",
+    "est_net_worth": 750000000,
+    "job_role": ["Model", "Influencer", "Businesswoman", "TV Personality"],
+    "tail_number": "N810KJ",
+    "aircraft_model": "GLEX"
+  },
+  {
+    "name": "Donald Trump",
+    "gender": "M",
+    "est_net_worth": 2500000000,
+    "job_role": ["Businessman", "Politician", "TV Personality"],
+    "tail_number": "N757AF",
+    "aircraft_model": "B752"
+  }
+]
