@@ -164,15 +164,12 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         if not country_id:
             curs.execute("SELECT continent_id FROM continent WHERE code = %s", (continent,))
             continent_id = curs.fetchall()
-
             if not continent_id:
                 curs.execute("INSERT INTO continent (code, name) VALUES (%s, %s) RETURNING continent_id",
                              (continent, continent_name))
                 continent_id = dict(curs.fetchall()[0])["continent_id"]
-
             else:
                 continent_id = dict(continent_id[0])["continent_id"]
-
             curs.execute("INSERT INTO country (code, name, continent_id) VALUES (%s, %s, %s) RETURNING country_id",
                          (country, country_name, continent_id))
             country_id = dict(curs.fetchall()[0])["country_id"]
