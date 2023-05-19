@@ -12,3 +12,14 @@ disable =
     unused-import,
     unused-argument,
     import-error
+
+# Additional configurations.
+suggestion-mode = yes
+fail-under = 8.5
+allow-global-unused-variables = no
+max-line-length = 150
+good-names = i,j,k,ex,Run,_,f,pd,df
+bad-names = foo,bar,baz,toto,tutu,tata
+function-naming-style = snake_case
+variable-naming-style = snake_case
+class-attribute-naming-style = PascalCase
