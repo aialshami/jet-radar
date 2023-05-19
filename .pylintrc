@@ -1,0 +1,14 @@
+[pylint]
+# Disable specific Pylint messages.
+disable =
+    unused-import,
+    unused-argument,
+    import-error
+
+
+[pylint.messages_control]
+# Disable specific Pylint messages for the messages control.
+disable = 
+    unused-import,
+    unused-argument,
+    import-error
