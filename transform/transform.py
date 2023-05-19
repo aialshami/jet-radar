@@ -102,6 +102,8 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
     jets = df["aircraft_reg"].unique()
     for jet in jets:
         flight = df[df["aircraft_reg"] == jet].sort_values("time_input").reset_index().to_dict('records')
+
+        emergency = flight[-1]["emergency"]
     
         flight_no = flight[0]["flight_no"]
         if flight_no:
@@ -131,13 +133,13 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
                 if seconds_since_last_event < 30*60:
                     break
                 
-                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location
+                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
                 # REMOVE RECORDS FROM STAGING DB
             else:
                 arr_time = previous_event["time_input"]
                 arr_location = (previous_event["lat"], previous_event["lon"])
 
-                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location
+                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
                 # REMOVE RECORDS FROM STAGING DB
 
                 dep_time = current_event["time_input"]
@@ -186,11 +188,13 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
 
         curs.execute("INSERT INTO airport (name, iata, lat, lon, country_id) VALUES (%s, %s, %s, %s, %s)",
                      (name, iata, lat, lon, country_id))
-    # REMEMBER TO COMMIT
+    
+    conn.commit()
+    curs.close()
 
 
 def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info) -> None:
-    """"""
+    """Inserts jet owner data """
 
     curs = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -253,15 +257,63 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
             else:
                 job_role_id = dict(job_role_id[0])["job_role_id"]
 
-            curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s)",
+            curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
                          (owner_id, job_role_id))
     
-    # REMEMBER TO COMMIT
+    conn.commit()
+    curs.close()
+
+
+def insert_todays_flights(conn: connection) -> None:
+    """Inserts todays flights into the database. Expects a production connection object."""
+    
+    curs = conn.cursor(cursor_factory=RealDictCursor)
+
+    for flight in extract_todays_flights(staging_conn):
+        tail_number, flight_no, dep_time, dep_location, arr_time, arr_location, emergency = flight
+
+        print(tail_number)
+
+        dep_airport = find_nearest_airport(*dep_location, airport_info)
+        arr_airport = find_nearest_airport(*arr_location, airport_info)
+        if dep_airport == arr_airport: continue
+
+        curs.execute("SELECT airport_id FROM airport WHERE iata = %s", (dep_airport,))
+        dep_airport_id = dict(curs.fetchall()[0])["airport_id"]
+        curs.execute("SELECT airport_id FROM airport WHERE iata = %s", (arr_airport,))
+        arr_airport_id = dict(curs.fetchall()[0])["airport_id"]
+
+        curs.execute("""SELECT code FROM model JOIN aircraft ON model.model_id = aircraft.model_id
+                     WHERE aircraft.tail_number = %s""", (tail_number,))
+        aircraft_model = curs.fetchall()
+        if aircraft_model:
+            aircraft_model = dict(aircraft_model[0])["code"]
+            fuel_usage = calculate_fuel_consumption(dep_time, arr_time, aircraft_model, aircraft_info)
+        else:
+            fuel_usage = None
+
+        curs.execute("SELECT emergency_id FROM emergency WHERE type = %s", (emergency,))
+        emergency_id = curs.fetchall()
+        if not emergency_id:
+            curs.execute("INSERT INTO emergency (type) VALUES (%s) RETURNING emergency_id", (emergency,))
+            emergency_id = dict(curs.fetchall()[0])["emergency_id"]
+        else:
+            emergency_id = dict(emergency_id[0])["emergency_id"]
+
+        print(emergency_id)
+
+        curs.execute("""INSERT INTO flight (flight_number, dep_airport_id, arr_airport_id, dep_time, arr_time, tail_number,
+                     emergency_id, fuel_usage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                     (flight_no, dep_airport_id, arr_airport_id, dep_time, arr_time, tail_number, emergency_id, fuel_usage))
+    
+    curs.close()
+    conn.commit()
 
 
 
 
 if __name__ == "__main__":
+
 
     airport_info = load_airport_info()
     aircraft_info = load_aircraft_info()
@@ -270,22 +322,23 @@ if __name__ == "__main__":
     staging_conn = get_db_connection("staging")
     production_conn = get_db_connection("production")
 
-    """for flight in extract_todays_flights(staging_conn):
-        jet, flight_no, dep_time, dep_location, arr_time, arr_location = flight
-        
-        dep_airport = find_nearest_airport(*dep_location, airport_info)
-        arr_airport = find_nearest_airport(*arr_location, airport_info)
-        if dep_airport == arr_airport: continue"""
-    
-    #insert_airport_info(production_conn, airport_info)
-    insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
 
-    """with production_conn.cursor(cursor_factory=RealDictCursor) as curs:
-        curs.execute("SELECT * FROM continent;")
-        print(curs.fetchall())
-        curs.execute("SELECT * FROM country LIMIT 10;")
-        print(curs.fetchall())
-        curs.execute("SELECT * FROM airport LIMIT 10;")
-        print(curs.fetchall())"""
-   
-        
+    curs = production_conn.cursor(cursor_factory=RealDictCursor)
+
+    curs.execute("SELECT * FROM airport LIMIT 1")
+    airport_test = curs.fetchall()
+    if not airport_test:
+        insert_airport_info(production_conn, airport_info)
+
+    curs.execute("SELECT * FROM aircraft LIMIT 1")
+    aircraft_test = curs.fetchall()
+    if not aircraft_test:
+        insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
+
+    curs.close()
+
+
+    insert_todays_flights(production_conn)
+
+    production_conn.close()
+    staging_conn.close()
