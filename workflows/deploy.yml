@@ -1,0 +1,83 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  provision-ecrs:
+    name: provisions ECR instances ready for Docker images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        # Step 1: Checkout the repository code
+      - name: configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+        # Step 2: Configure AWS credentials for authentication
+      - name: setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        # Step 3: Set up Terraform for infrastructure provisioning
+      - name: deploy ECRs
+        working-directory: <<TERRAFORM_REPO_DIR>>
+        run: |
+          terraform init
+          terraform apply -auto-approve -input=false
+        # Step 4: Deploy ECR instances using Terraform
+
+  build-containers:
+    name: Dockerizes staging script and pushes to ECR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        # Step 1: Checkout the repository code
+      - name: configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+        # Step 2: Configure AWS credentials for authentication
+      - name: Login to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        # Step 3: Log in to AWS ECR to authenticate Docker push
+      - name: dockerize staging
+        working-directory: <<STAGING_DOCKER_DIR>>
+        run: |
+          docker build -t <<STAGING_IMG_NAME>> . --platform linux/amd64
+          docker tag <<STAGING_IMG_NAME>>:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jet-staging-repo:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jet-staging-repo:latest
+        # Step 4: Build and push the staging Docker image to AWS ECR
+      - name: dockerize production
+        working-directory: <<PRODUCTION_DOCKER_DIR>>
+        run: |
+          docker build -t <<PRODUCTION_IMG_NAME>> . --platform linux/amd64
+          docker tag <<PRODUCTION_IMG_NAME>>:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jet-production-repo:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jet-production-repo:latest
+        # Step 5: Build and push the production Docker image to AWS ECR
+
+deploy-cloud-infrastructure:
+  name: provisions cloud infrastructure deploys pipeline to AWS
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+      # Step 1: Checkout the repository code
+    - name: configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+      # Step 2: Configure AWS credentials for authentication
+    - name: setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      # Step 3: Set up Terraform for infrastructure provisioning
+    - name: deploy Terraform infrastructure
+      working-directory: <<TERRAFORM_PIPELINE_DIR>>
+      run: |
+        terraform init
+        terraform apply -auto-approve -input=false
+      # Step 4: Deploy the Terraform infrastructure using `terraform apply`
