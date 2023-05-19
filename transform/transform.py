@@ -193,7 +193,7 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     curs.close()
 
 
-def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info) -> None:
+def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info: list[dict]) -> None:
     """Inserts jet owner data """
 
     curs = conn.cursor(cursor_factory=RealDictCursor)
