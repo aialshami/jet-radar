@@ -195,6 +195,7 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
     curs = conn.cursor(cursor_factory=RealDictCursor)
 
     for owner in owner_info:
+
         name = owner["name"]
         gender = owner["gender"]
         est_net_worth = owner["est_net_worth"]
@@ -209,7 +210,7 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
             curs.execute("SELECT gender_id FROM gender WHERE name = %s", (gender,))
             gender_id = curs.fetchall()
             if not gender_id:
-                curs.execute("INSERT INTO gender (name) VALUES %s RETURNING gender_id", (gender,))
+                curs.execute("INSERT INTO gender (name) VALUES (%s) RETURNING gender_id", (gender,))
                 gender_id = dict(curs.fetchall()[0])["gender_id"]
             else:
                 gender_id = dict(gender_id[0])["gender_id"]
@@ -240,7 +241,7 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
         else:
             model_id = None
 
-        curs.execute("INSERT INTO aircraft (tail_number, model_id, owner_id) VALUES (%s. %s, %s)",
+        curs.execute("INSERT INTO aircraft (tail_number, model_id, owner_id) VALUES (%s, %s, %s)",
                      (tail_number, model_id, owner_id))
         
         for job_role in job_roles:
