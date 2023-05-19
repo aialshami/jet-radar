@@ -1,25 +1,27 @@
 [
   {
     "name": "Elon Musk",
-    "gender": "M",
+    "gender": "Male",
     "est_net_worth": 180700000000,
     "job_role": ["CEO", "Businessman"],
     "tail_number": "N628TS",
     "aircraft_model": "GLF6",
-    "icao_hex": "A835AF"
+    "icao_hex": "A835AF",
+    "birthdate": "28/06/1971"
   },
   {
     "name": "Tom Cruise",
-    "gender": "M",
+    "gender": "Male",
     "est_net_worth": 600000000,
     "job_role": ["Actor", "Producer"],
     "tail_number": "N350XX",
     "aircraft_model": "CL30",
-    "icao_hex": "A3E6F0"
+    "icao_hex": "A3E6F0",
+    "birthdate": "03/07/1962"
   },
   {
     "name": "Oprah Winfrey",
-    "gender": "F",
+    "gender": "Female",
     "est_net_worth": 2500000000,
     "job_role": [
       "Talk Show Host",
@@ -30,88 +32,88 @@
     ],
     "tail_number": "N540W",
     "aircraft_model": "GLF6",
-    "icao_hex": "A6D9E0"
+    "icao_hex": "A6D9E0",
+    "birthdate": "29/01/1954"
   },
   {
     "name": "Floyd Mayweather",
-    "gender": "M",
+    "gender": "Male",
     "est_net_worth": 450000000,
     "job_role": ["Boxer", "Promoter"],
     "tail_number": "N151SD",
     "aircraft_model": "GLF4",
-    "icao_hex": "A0CF7A"
+    "icao_hex": "A0CF7A",
+    "birthdate": "24/02/1977"
   },
   {
     "name": "Taylor Swift",
-    "gender": "F",
+    "gender": "Female",
     "est_net_worth": 2500000000,
     "job_role": ["Singer", "Record Producer"],
     "tail_number": "N898TS",
     "aircraft_model": "F900",
-    "icao_hex": "AC64C6"
+    "icao_hex": "AC64C6",
+    "birthdate": "13/12/1989"
   },
   {
     "name": "Bill Gates",
-    "gender": "M",
+    "gender": "Male",
     "est_net_worth": 113900000000,
     "job_role": ["Businessman"],
     "tail_number": "N887WM",
     "aircraft_model": "GLF6",
-    "icao_hex": "AC39D6"
+    "icao_hex": "AC39D6",
+    "birthdate": "28/10/1955"
   },
   {
     "name": "Bill Gates",
-    "gender": "M",
+    "gender": "Male",
     "est_net_worth": 113900000000,
     "job_role": ["Businessman"],
     "tail_number": "N194WM",
     "aircraft_model": "GLF6",
-    "icao_hex": "A17907"
+    "icao_hex": "A17907",
+    "birthdate": "28/10/1955"
   },
   {
     "name": "Kim Kardashian",
-    "gender": "F",
+    "gender": "Female",
     "est_net_worth": 1200000000,
     "job_role": ["Model", "Influencer", "Businesswoman", "TV Personality"],
     "tail_number": "N1980K",
     "aircraft_model": "GLF6",
-    "icao_hex": "A18845"
+    "icao_hex": "A18845",
+    "birthdate": "21/10/1980"
   },
   {
     "name": "Travis Scott",
-    "gender": "M",
+    "gender": "Male",
     "est_net_worth": 80000000,
     "job_role": ["Singer", "Rapper", "Record Producer"],
     "tail_number": "N713TS",
     "aircraft_model": "E190",
-    "icao_hex": "A988EC"
+    "icao_hex": "A988EC",
+    "birthdate": "30/04/1991"
   },
   {
     "name": "Kylie Jenner",
-    "gender": "F",
+    "gender": "Female",
     "est_net_worth": 750000000,
     "job_role": ["Model", "Influencer", "Businesswoman", "TV Personality"],
     "tail_number": "N810KJ",
     "aircraft_model": "GLEX",
-    "icao_hex": "AB0A46"
+    "icao_hex": "AB0A46",
+    "birthdate": "10/08/1997"
   },
   {
     "name": "Donald Trump",
-    "gender": "M",
+    "gender": "Male",
     "est_net_worth": 2500000000,
     "job_role": ["Businessman", "Politician", "TV Personality"],
     "tail_number": "N757AF",
     "aircraft_model": "B752",
-    "icao_hex": "AA3410"
-  },
-  {
-    "name": "Donald Trump",
-    "gender": "M",
-    "est_net_worth": 2500000000,
-    "job_role": ["Businessman", "Politician", "TV Personality"],
-    "tail_number": "N757AF",
-    "aircraft_model": "B752",
-    "icao_hex": "AA3410"
+    "icao_hex": "AA3410",
+    "birthdate": "14/06/1946"
   },
   {
     "name": "South Aero Inc",
@@ -120,7 +122,8 @@
     "job_role": ["Commercial Airline"],
     "tail_number": "N29AN",
     "aircraft_model": null,
-    "icao_hex": "A2F32E"
+    "icao_hex": "A2F32E",
+    "birthdate": null
   },
   {
     "name": "Volaris",
@@ -129,7 +132,8 @@
     "job_role": ["Commercial Airline"],
     "tail_number": "XA-VSM",
     "aircraft_model": null,
-    "icao_hex": "0D0E01"
+    "icao_hex": "0D0E01",
+    "birthdate": null
   },
   {
     "name": "LATAM Airlines",
@@ -138,7 +142,8 @@
     "job_role": ["Commercial Airline"],
     "tail_number": "PT-MUA",
     "aircraft_model": null,
-    "icao_hex": "E48189"
+    "icao_hex": "E48189",
+    "birthdate": null
   },
   {
     "name": "Plus Ultra",
@@ -147,6 +152,7 @@
     "job_role": ["Commercial Airline"],
     "tail_number": "EC-MQM",
     "aircraft_model": null,
-    "icao_hex": "3453C9"
+    "icao_hex": "3453C9",
+    "birthdate": null
   }
 ]
