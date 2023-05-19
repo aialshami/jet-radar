@@ -13,6 +13,7 @@ import pandas as pd
 
 AIRPORTS_JSON_FILE_PATH = "./airports.json"
 AIRCRAFT_INFO_JSON_FILE_PATH = "./aircraft_fuel_consumption_rates.json"
+JET_OWNERS_JSON_FILE_PATH = "./jet_owners.json"
 
 
 load_dotenv()
@@ -45,6 +46,13 @@ def load_airport_info(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dict[dic
 def load_aircraft_info(data_file_path: str = AIRCRAFT_INFO_JSON_FILE_PATH) -> dict[dict]:
     """Returns data on aircraft models including the name, fuel consumption and category as 
     a dictionary of dictionaries. Expects a file path as input."""
+
+    with open(data_file_path, encoding="utf-8") as f:
+        return json.load(f)
+    
+
+def load_jet_owners_info(data_file_path: str = JET_OWNERS_JSON_FILE_PATH) -> list[dict]:
+    """Returns data on tracked jets and their owners. Expects a file path as input."""
 
     with open(data_file_path, encoding="utf-8") as f:
         return json.load(f)
@@ -182,7 +190,73 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
 
 
 def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info) -> None:
-    pass
+    """"""
+
+    curs = conn.cursor(cursor_factory=RealDictCursor)
+
+    for owner in owner_info:
+        name = owner["name"]
+        gender = owner["gender"]
+        est_net_worth = owner["est_net_worth"]
+        birthdate = owner["birthdate"]
+        if birthdate:
+            birthdate = datetime.strptime(birthdate, "%d/%m/%Y")
+        tail_number = owner["tail_number"]
+        job_roles = owner["job_role"]
+        aircraft_model = owner["aircraft_model"]
+
+        if gender:
+            curs.execute("SELECT gender_id FROM gender WHERE name = %s", (gender,))
+            gender_id = curs.fetchall()
+            if not gender_id:
+                curs.execute("INSERT INTO gender (name) VALUES %s RETURNING gender_id", (gender,))
+                gender_id = dict(curs.fetchall()[0])["gender_id"]
+            else:
+                gender_id = dict(gender_id[0])["gender_id"]
+        else:
+            gender_id = None
+
+        curs.execute("SELECT owner_id FROM owner WHERE name = %s", (name,))
+        owner_id = curs.fetchall()
+        if not owner_id:
+            curs.execute("INSERT INTO owner (name, gender_id, est_net_worth, birthdate) VALUES (%s, %s, %s, %s) RETURNING owner_id",
+                         (name, gender_id, est_net_worth, birthdate))
+            owner_id = dict(curs.fetchall()[0])["owner_id"]
+        else:
+            owner_id = dict(owner_id[0])["owner_id"]
+
+        if aircraft_model:
+            aircraft_model_name = aircraft_info[aircraft_model]["name"]
+            fuel_efficiency = aircraft_info[aircraft_model]["galph"]
+
+            curs.execute("SELECT model_id FROM model WHERE code = %s", (aircraft_model,))
+            model_id = curs.fetchall()
+            if not model_id:
+                curs.execute("INSERT INTO model (code, name, fuel_efficiency) VALUES (%s, %s, %s) RETURNING model_id",
+                            (aircraft_model, aircraft_model_name, fuel_efficiency))
+                model_id = dict(curs.fetchall()[0])["model_id"]
+            else:
+                model_id = dict(model_id[0])["model_id"]
+        else:
+            model_id = None
+
+        curs.execute("INSERT INTO aircraft (tail_number, model_id, owner_id) VALUES (%s. %s, %s)",
+                     (tail_number, model_id, owner_id))
+        
+        for job_role in job_roles:
+            curs.execute("SELECT job_role_id FROM job_role WHERE name = %s", (job_role,))
+            job_role_id = curs.fetchall()
+            if not job_role_id:
+                curs.execute("INSERT INTO job_role (name) VALUES (%s) RETURNING job_role_id", (job_role,))
+                job_role_id = dict(curs.fetchall()[0])["job_role_id"]
+            else:
+                job_role_id = dict(job_role_id[0])["job_role_id"]
+
+            curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s)",
+                         (owner_id, job_role_id))
+    
+    # REMEMBER TO COMMIT
+
 
 
 
@@ -190,6 +264,7 @@ if __name__ == "__main__":
 
     airport_info = load_airport_info()
     aircraft_info = load_aircraft_info()
+    jet_owners_info = load_jet_owners_info()
 
     staging_conn = get_db_connection("staging")
     production_conn = get_db_connection("production")
@@ -201,14 +276,15 @@ if __name__ == "__main__":
         arr_airport = find_nearest_airport(*arr_location, airport_info)
         if dep_airport == arr_airport: continue"""
     
-    insert_airport_info(production_conn, airport_info)
+    #insert_airport_info(production_conn, airport_info)
+    insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
 
-    with production_conn.cursor(cursor_factory=RealDictCursor) as curs:
+    """with production_conn.cursor(cursor_factory=RealDictCursor) as curs:
         curs.execute("SELECT * FROM continent;")
         print(curs.fetchall())
         curs.execute("SELECT * FROM country LIMIT 10;")
         print(curs.fetchall())
         curs.execute("SELECT * FROM airport LIMIT 10;")
-        print(curs.fetchall())
+        print(curs.fetchall())"""
    
         
