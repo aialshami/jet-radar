@@ -5,7 +5,8 @@
     "est_net_worth": 180700000000,
     "job_role": ["CEO", "Businessman"],
     "tail_number": "N628TS",
-    "aircraft_model": "GLF6"
+    "aircraft_model": "GLF6",
+    "icao_hex": "A835AF"
   },
   {
     "name": "Tom Cruise",
@@ -13,7 +14,8 @@
     "est_net_worth": 600000000,
     "job_role": ["Actor", "Producer"],
     "tail_number": "N350XX",
-    "aircraft_model": "CL30"
+    "aircraft_model": "CL30",
+    "icao_hex": "A3E6F0"
   },
   {
     "name": "Oprah Winfrey",
@@ -27,7 +29,8 @@
       "Businesswoman"
     ],
     "tail_number": "N540W",
-    "aircraft_model": "GLF6"
+    "aircraft_model": "GLF6",
+    "icao_hex": "A6D9E0"
   },
   {
     "name": "Floyd Mayweather",
@@ -35,7 +38,8 @@
     "est_net_worth": 450000000,
     "job_role": ["Boxer", "Promoter"],
     "tail_number": "N151SD",
-    "aircraft_model": "GLF4"
+    "aircraft_model": "GLF4",
+    "icao_hex": "A0CF7A"
   },
   {
     "name": "Taylor Swift",
@@ -43,7 +47,8 @@
     "est_net_worth": 2500000000,
     "job_role": ["Singer", "Record Producer"],
     "tail_number": "N898TS",
-    "aircraft_model": "F900"
+    "aircraft_model": "F900",
+    "icao_hex": "AC64C6"
   },
   {
     "name": "Bill Gates",
@@ -51,7 +56,8 @@
     "est_net_worth": 113900000000,
     "job_role": ["Businessman"],
     "tail_number": "N887WM",
-    "aircraft_model": "GLF6"
+    "aircraft_model": "GLF6",
+    "icao_hex": "AC39D6"
   },
   {
     "name": "Bill Gates",
@@ -59,7 +65,8 @@
     "est_net_worth": 113900000000,
     "job_role": ["Businessman"],
     "tail_number": "N194WM",
-    "aircraft_model": "GLF6"
+    "aircraft_model": "GLF6",
+    "icao_hex": "A17907"
   },
   {
     "name": "Kim Kardashian",
@@ -67,7 +74,8 @@
     "est_net_worth": 1200000000,
     "job_role": ["Model", "Influencer", "Businesswoman", "TV Personality"],
     "tail_number": "N1980K",
-    "aircraft_model": "GLF6"
+    "aircraft_model": "GLF6",
+    "icao_hex": "A18845"
   },
   {
     "name": "Travis Scott",
@@ -75,7 +83,8 @@
     "est_net_worth": 80000000,
     "job_role": ["Singer", "Rapper", "Record Producer"],
     "tail_number": "N713TS",
-    "aircraft_model": "E190"
+    "aircraft_model": "E190",
+    "icao_hex": "A988EC"
   },
   {
     "name": "Kylie Jenner",
@@ -83,7 +92,8 @@
     "est_net_worth": 750000000,
     "job_role": ["Model", "Influencer", "Businesswoman", "TV Personality"],
     "tail_number": "N810KJ",
-    "aircraft_model": "GLEX"
+    "aircraft_model": "GLEX",
+    "icao_hex": "AB0A46"
   },
   {
     "name": "Donald Trump",
@@ -91,6 +101,52 @@
     "est_net_worth": 2500000000,
     "job_role": ["Businessman", "Politician", "TV Personality"],
     "tail_number": "N757AF",
-    "aircraft_model": "B752"
+    "aircraft_model": "B752",
+    "icao_hex": "AA3410"
+  },
+  {
+    "name": "Donald Trump",
+    "gender": "M",
+    "est_net_worth": 2500000000,
+    "job_role": ["Businessman", "Politician", "TV Personality"],
+    "tail_number": "N757AF",
+    "aircraft_model": "B752",
+    "icao_hex": "AA3410"
+  },
+  {
+    "name": "South Aero Inc",
+    "gender": null,
+    "est_net_worth": null,
+    "job_role": ["Commercial Airline"],
+    "tail_number": "N29AN",
+    "aircraft_model": null,
+    "icao_hex": "A2F32E"
+  },
+  {
+    "name": "Volaris",
+    "gender": null,
+    "est_net_worth": null,
+    "job_role": ["Commercial Airline"],
+    "tail_number": "XA-VSM",
+    "aircraft_model": null,
+    "icao_hex": "0D0E01"
+  },
+  {
+    "name": "LATAM Airlines",
+    "gender": null,
+    "est_net_worth": null,
+    "job_role": ["Commercial Airline"],
+    "tail_number": "PT-MUA",
+    "aircraft_model": null,
+    "icao_hex": "E48189"
+  },
+  {
+    "name": "Plus Ultra",
+    "gender": null,
+    "est_net_worth": null,
+    "job_role": ["Commercial Airline"],
+    "tail_number": "EC-MQM",
+    "aircraft_model": null,
+    "icao_hex": "3453C9"
   }
 ]
