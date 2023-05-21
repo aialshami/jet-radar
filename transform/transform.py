@@ -15,6 +15,10 @@ from s3fs import S3FileSystem
 AIRPORTS_JSON_FILE_PATH = "./airports.json"
 AIRCRAFT_INFO_JSON_FILE_PATH = "./aircraft_fuel_consumption_rates.json"
 JET_OWNERS_JSON_FILE_PATH = "./jet_owners.json"
+
+AIRPORTS_JSON = "airports.json"
+AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
+JET_OWNERS_JSON = "jet_owners.json"
 BUCKET_NAME = "jet-bucket"
 
 
@@ -326,8 +330,12 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection, airport
 
 if __name__ == "__main__":
 
-    print(load_json_file_from_s3("jet_owners.json"))
 
+    airport_info = load_json_file_from_s3(AIRPORTS_JSON)
+    aircraft_info = load_json_file_from_s3(AIRCRAFTS_JSON)
+    jet_owners_info = load_json_file_from_s3(JET_OWNERS_JSON)
+
+    print(airport_info, aircraft_info, jet_owners_info)
 
     """airport_info = load_airport_info()
     aircraft_info = load_aircraft_info()
