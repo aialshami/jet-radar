@@ -185,6 +185,12 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
     curs = conn.cursor(cursor_factory=RealDictCursor)
 
     for owner in owner_info:
+        
+        tail_number = owner["tail_number"]
+
+        curs.execute("SELECT * FROM aircraft WHERE tail_number = %s", (tail_number,))
+        if curs.fetchall():
+            continue
 
         name = owner["name"]
         gender = owner["gender"]
@@ -192,7 +198,6 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
         birthdate = owner["birthdate"]
         if birthdate:
             birthdate = datetime.strptime(birthdate, "%d/%m/%Y")
-        tail_number = owner["tail_number"]
         job_roles = owner["job_role"]
         aircraft_model = owner["aircraft_model"]
 
@@ -250,12 +255,12 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
     curs.close()
 
 
-def insert_todays_flights(prod_conn: connection, stage_conn: connection, airport_info: dict[dict], aircraft_info: dict[dict]) -> None:
+def insert_todays_flights(prod_conn: connection, staging_conn: connection, airport_info: dict[dict], aircraft_info: dict[dict]) -> None:
     """Inserts todays flights into the database. Expects a production connection object."""
     
     curs = prod_conn.cursor(cursor_factory=RealDictCursor)
 
-    for flight in extract_todays_flights(stage_conn):
+    for flight in extract_todays_flights(staging_conn):
         tail_number, flight_no, dep_time, dep_location, arr_time, arr_location, emergency = flight
 
         print(tail_number)
@@ -317,10 +322,7 @@ if __name__ == "__main__":
     if not airport_test:
         insert_airport_info(production_conn, airport_info)
 
-    curs.execute("SELECT * FROM aircraft LIMIT 1")
-    aircraft_test = curs.fetchall()
-    if not aircraft_test:
-        insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
+    insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
 
     curs.close()
 
