@@ -84,6 +84,7 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
     and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
     df = pd.read_sql("SELECT * FROM tracked_event;", conn)
+    curs = conn.cursor(cursor_factory=RealDictCursor)
 
     jets = df["aircraft_reg"].unique()
     for jet in jets:
@@ -121,12 +122,16 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
                 
                 yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
                 # REMOVE RECORDS FROM STAGING DB
+                curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
+                             (jet, arr_time))
             else:
                 arr_time = previous_event["time_input"]
                 arr_location = (previous_event["lat"], previous_event["lon"])
 
                 yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
                 # REMOVE RECORDS FROM STAGING DB
+                curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
+                             (jet, arr_time))
 
                 dep_time = current_event["time_input"]
                 dep_location = (current_event["lat"], current_event["lon"])
