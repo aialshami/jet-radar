@@ -12,10 +12,6 @@ import pandas as pd
 from s3fs import S3FileSystem
 
 
-AIRPORTS_JSON_FILE_PATH = "./airports.json"
-AIRCRAFT_INFO_JSON_FILE_PATH = "./aircraft_fuel_consumption_rates.json"
-JET_OWNERS_JSON_FILE_PATH = "./jet_owners.json"
-
 AIRPORTS_JSON = "airports.json"
 AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
 JET_OWNERS_JSON = "jet_owners.json"
@@ -46,32 +42,6 @@ def load_json_file_from_s3(file_name: str, bucket_name: str = BUCKET_NAME) -> ob
                       secret=config["SECRET_ACCESS_KEY"])
     
     return json.load(s3.open(path=f"{bucket_name}/{file_name}"))
-
-
-def load_airport_info(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dict[dict]:
-    """Returns a dictionary with airport codes as keys and the location of the 
-    airport in a latitude, longitude tuple as values. Expects a file path as input."""
-
-    with open(data_file_path, encoding="utf-8") as f:
-        airport_data = json.load(f)
-
-    return {airport["iata"]: airport for airport in airport_data 
-            if "lat" in airport and "lon" in airport}
-
-
-def load_aircraft_info(data_file_path: str = AIRCRAFT_INFO_JSON_FILE_PATH) -> dict[dict]:
-    """Returns data on aircraft models including the name, fuel consumption and category as 
-    a dictionary of dictionaries. Expects a file path as input."""
-
-    with open(data_file_path, encoding="utf-8") as f:
-        return json.load(f)
-    
-
-def load_jet_owners_info(data_file_path: str = JET_OWNERS_JSON_FILE_PATH) -> list[dict]:
-    """Returns data on tracked jets and their owners. Expects a file path as input."""
-
-    with open(data_file_path, encoding="utf-8") as f:
-        return json.load(f)
 
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -335,11 +305,6 @@ if __name__ == "__main__":
     aircraft_info = load_json_file_from_s3(AIRCRAFTS_JSON)
     jet_owners_info = load_json_file_from_s3(JET_OWNERS_JSON)
 
-    print(airport_info, aircraft_info, jet_owners_info)
-
-    """airport_info = load_airport_info()
-    aircraft_info = load_aircraft_info()
-    jet_owners_info = load_jet_owners_info()
 
     staging_conn = get_db_connection("staging")
     production_conn = get_db_connection("production")
@@ -363,4 +328,4 @@ if __name__ == "__main__":
     insert_todays_flights(production_conn)
 
     production_conn.close()
-    staging_conn.close()"""
+    staging_conn.close()
