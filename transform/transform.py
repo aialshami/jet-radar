@@ -1,3 +1,5 @@
+"""This script reads tracked events from the staging database, and inserts the parsed flight information
+into the production database using airports data, aircraft data and tracked owners data stored in s3."""
 import json
 import os
 from math import sin, cos, acos, pi
@@ -42,7 +44,7 @@ def load_json_file_from_s3(file_name: str, bucket_name: str = BUCKET_NAME) -> ob
 
     s3 = S3FileSystem(key=config["ACCESS_KEY_ID"],
                       secret=config["SECRET_ACCESS_KEY"])
-    
+
     return json.load(s3.open(path=f"{bucket_name}/{file_name}"))
 
 
@@ -93,7 +95,7 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
         flight = df[df["aircraft_reg"] == jet].sort_values("time_input").reset_index().to_dict('records')
 
         emergency = flight[-1]["emergency"]
-    
+
         flight_no = flight[0]["flight_no"]
         if flight_no:
             flight_no = flight_no.strip()
@@ -113,14 +115,14 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
 
             if event_gap < 60*60 and i != num_of_events-1:
                 continue
-            elif i == num_of_events-1:
+            if i == num_of_events-1:
                 arr_time = current_event["time_input"]
                 arr_location = (current_event["lat"], current_event["lon"])
 
                 seconds_since_last_event = (pd.Timestamp.now() - arr_time).total_seconds()
                 if seconds_since_last_event < 30*60:
                     break
-                
+
                 yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
                 curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
                              (jet, arr_time))
@@ -139,7 +141,7 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     """Inserts airport data into production db and populates country/ continent tables.
     Expects the production db connection object and the airport data."""
-    
+
     curs = conn.cursor(cursor_factory=RealDictCursor)
     curs.execute("SELECT * FROM airport LIMIT 1")
     if curs.fetchall():
@@ -187,12 +189,12 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
 
 
 def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info: list[dict]) -> None:
-    """Inserts jet owner data """
+    """Inserts jet owner data."""
 
     curs = conn.cursor(cursor_factory=RealDictCursor)
 
     for owner in owner_info:
-        
+
         tail_number = owner["tail_number"]
 
         curs.execute("SELECT * FROM aircraft WHERE tail_number = %s", (tail_number,))
@@ -222,7 +224,8 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
         curs.execute("SELECT owner_id FROM owner WHERE name = %s", (name,))
         owner_id = curs.fetchall()
         if not owner_id:
-            curs.execute("INSERT INTO owner (name, gender_id, est_net_worth, birthdate) VALUES (%s, %s, %s, %s) RETURNING owner_id",
+            curs.execute("""INSERT INTO owner (name, gender_id, est_net_worth, birthdate)
+                         VALUES (%s, %s, %s, %s) RETURNING owner_id""",
                          (name, gender_id, est_net_worth, birthdate))
             owner_id = dict(curs.fetchall()[0])["owner_id"]
         else:
@@ -245,7 +248,7 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
 
         curs.execute("INSERT INTO aircraft (tail_number, model_id, owner_id) VALUES (%s, %s, %s)",
                      (tail_number, model_id, owner_id))
-        
+
         for job_role in job_roles:
             curs.execute("SELECT job_role_id FROM job_role WHERE name = %s", (job_role,))
             job_role_id = curs.fetchall()
@@ -261,19 +264,21 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
     curs.close()
 
 
-def insert_todays_flights(prod_conn: connection, staging_conn: connection, airport_info: dict[dict], aircraft_info: dict[dict]) -> None:
+def insert_todays_flights(prod_conn: connection, stage_conn: connection,
+                          airport_info: dict[dict], aircraft_info: dict[dict]) -> None:
     """Inserts todays flights into the database. Expects a production connection object."""
-    
+
     curs = prod_conn.cursor(cursor_factory=RealDictCursor)
 
-    for flight in extract_todays_flights(staging_conn):
+    for flight in extract_todays_flights(stage_conn):
         tail_number, flight_no, dep_time, dep_location, arr_time, arr_location, emergency = flight
 
         print(tail_number)
 
         dep_airport = find_nearest_airport(*dep_location, airport_info)
         arr_airport = find_nearest_airport(*arr_location, airport_info)
-        if dep_airport == arr_airport: continue
+        if dep_airport == arr_airport:
+            continue
 
         curs.execute("SELECT airport_id FROM airport WHERE iata = %s", (dep_airport,))
         dep_airport_id = dict(curs.fetchall()[0])["airport_id"]
@@ -302,7 +307,7 @@ def insert_todays_flights(prod_conn: connection, staging_conn: connection, airpo
         curs.execute("""INSERT INTO flight (flight_number, dep_airport_id, arr_airport_id, dep_time, arr_time, tail_number,
                      emergency_id, fuel_usage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
                      (flight_no, dep_airport_id, arr_airport_id, dep_time, arr_time, tail_number, emergency_id, fuel_usage))
-    
+
     curs.close()
 
 
@@ -310,18 +315,18 @@ def insert_todays_flights(prod_conn: connection, staging_conn: connection, airpo
 
 if __name__ == "__main__":
 
-    airport_info = load_json_file_from_s3(AIRPORTS_JSON)
-    aircraft_info = load_json_file_from_s3(AIRCRAFTS_JSON)
-    jet_owners_info = load_json_file_from_s3(JET_OWNERS_JSON)
+    airport_data = load_json_file_from_s3(AIRPORTS_JSON)
+    aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)
+    jet_owners_data = load_json_file_from_s3(JET_OWNERS_JSON)
 
     staging_conn = get_db_connection(STAGING_SCHEMA)
     production_conn = get_db_connection(PRODUCTION_SCHEMA)
 
-    insert_airport_info(production_conn, airport_info)
+    insert_airport_info(production_conn, airport_data)
 
-    insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
+    insert_jet_owner_info(production_conn, aircraft_data, jet_owners_data)
 
-    insert_todays_flights(production_conn)
+    insert_todays_flights(production_conn, staging_conn, airport_data, aircraft_data)
 
     production_conn.commit()
     staging_conn.commit()
