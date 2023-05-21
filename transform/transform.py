@@ -137,6 +137,10 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     Expects the production db connection object and the airport data."""
     
     curs = conn.cursor(cursor_factory=RealDictCursor)
+    curs.execute("SELECT * FROM airport LIMIT 1")
+    if curs.fetchall():
+        return
+
     cc = coco.CountryConverter()
 
     continent_codes = {"Asia": "AS", "Europe": "EU", "Africa": "AF", "Oceania": "OC", "America": "AM"}
@@ -305,27 +309,16 @@ def insert_todays_flights(prod_conn: connection, staging_conn: connection, airpo
 
 if __name__ == "__main__":
 
-
     airport_info = load_json_file_from_s3(AIRPORTS_JSON)
     aircraft_info = load_json_file_from_s3(AIRCRAFTS_JSON)
     jet_owners_info = load_json_file_from_s3(JET_OWNERS_JSON)
 
-
     staging_conn = get_db_connection("staging")
     production_conn = get_db_connection("production")
 
-
-    curs = production_conn.cursor(cursor_factory=RealDictCursor)
-
-    curs.execute("SELECT * FROM airport LIMIT 1")
-    airport_test = curs.fetchall()
-    if not airport_test:
-        insert_airport_info(production_conn, airport_info)
+    insert_airport_info(production_conn, airport_info)
 
     insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
-
-    curs.close()
-
 
     insert_todays_flights(production_conn)
 
