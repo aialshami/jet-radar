@@ -117,13 +117,11 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
                 arr_time = current_event["time_input"]
                 arr_location = (current_event["lat"], current_event["lon"])
 
-                # if arr_time is recent, jet may not have landed yet
                 seconds_since_last_event = (pd.Timestamp.now() - arr_time).total_seconds()
                 if seconds_since_last_event < 30*60:
                     break
                 
                 yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                # REMOVE RECORDS FROM STAGING DB
                 curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
                              (jet, arr_time))
             else:
@@ -131,7 +129,6 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
                 arr_location = (previous_event["lat"], previous_event["lon"])
 
                 yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                # REMOVE RECORDS FROM STAGING DB
                 curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
                              (jet, arr_time))
 
