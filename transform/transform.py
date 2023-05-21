@@ -16,6 +16,8 @@ AIRPORTS_JSON = "airports.json"
 AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
 JET_OWNERS_JSON = "jet_owners.json"
 BUCKET_NAME = "jet-bucket"
+STAGING_SCHEMA = "staging"
+PRODUCTION_SCHEMA = "production"
 
 
 load_dotenv()
@@ -183,8 +185,7 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
 
         curs.execute("INSERT INTO airport (name, iata, lat, lon, country_id) VALUES (%s, %s, %s, %s, %s)",
                      (name, iata, lat, lon, country_id))
-    
-    conn.commit()
+
     curs.close()
 
 
@@ -259,8 +260,7 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
 
             curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
                          (owner_id, job_role_id))
-    
-    conn.commit()
+
     curs.close()
 
 
@@ -307,7 +307,6 @@ def insert_todays_flights(prod_conn: connection, staging_conn: connection, airpo
                      (flight_no, dep_airport_id, arr_airport_id, dep_time, arr_time, tail_number, emergency_id, fuel_usage))
     
     curs.close()
-    prod_conn.commit()
 
 
 
@@ -318,14 +317,17 @@ if __name__ == "__main__":
     aircraft_info = load_json_file_from_s3(AIRCRAFTS_JSON)
     jet_owners_info = load_json_file_from_s3(JET_OWNERS_JSON)
 
-    staging_conn = get_db_connection("staging")
-    production_conn = get_db_connection("production")
+    staging_conn = get_db_connection(STAGING_SCHEMA)
+    production_conn = get_db_connection(PRODUCTION_SCHEMA)
 
     insert_airport_info(production_conn, airport_info)
 
     insert_jet_owner_info(production_conn, aircraft_info, jet_owners_info)
 
     insert_todays_flights(production_conn)
+
+    production_conn.commit()
+    staging_conn.commit()
 
     production_conn.close()
     staging_conn.close()
