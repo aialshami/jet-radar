@@ -9,11 +9,13 @@ from psycopg2.extras import RealDictCursor
 from psycopg2.extensions import connection
 from dotenv import load_dotenv
 import pandas as pd
+from s3fs import S3FileSystem
 
 
 AIRPORTS_JSON_FILE_PATH = "./airports.json"
 AIRCRAFT_INFO_JSON_FILE_PATH = "./aircraft_fuel_consumption_rates.json"
 JET_OWNERS_JSON_FILE_PATH = "./jet_owners.json"
+BUCKET_NAME = "jet-bucket"
 
 
 load_dotenv()
@@ -30,6 +32,16 @@ def get_db_connection(schema: str) -> connection:
                             port = config["DATABASE_PORT"],
                             database = config["DATABASE_NAME"],
                             options = f"-c search_path={schema}")
+
+
+def load_json_file_from_s3(file_name: str, bucket_name: str = BUCKET_NAME) -> object:
+    """Reads a json file from an s3 bucket and returns the object. Requires the names of the bucket
+    and file as strings."""
+
+    s3 = S3FileSystem(key=config["ACCESS_KEY_ID"],
+                      secret=config["SECRET_ACCESS_KEY"])
+    
+    return json.load(s3.open(path=f"{bucket_name}/{file_name}"))
 
 
 def load_airport_info(data_file_path: str = AIRPORTS_JSON_FILE_PATH) -> dict[dict]:
@@ -264,12 +276,12 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
     curs.close()
 
 
-def insert_todays_flights(conn: connection) -> None:
+def insert_todays_flights(prod_conn: connection, stage_conn: connection, airport_info: dict[dict], aircraft_info: dict[dict]) -> None:
     """Inserts todays flights into the database. Expects a production connection object."""
     
-    curs = conn.cursor(cursor_factory=RealDictCursor)
+    curs = prod_conn.cursor(cursor_factory=RealDictCursor)
 
-    for flight in extract_todays_flights(staging_conn):
+    for flight in extract_todays_flights(stage_conn):
         tail_number, flight_no, dep_time, dep_location, arr_time, arr_location, emergency = flight
 
         print(tail_number)
@@ -307,15 +319,17 @@ def insert_todays_flights(conn: connection) -> None:
                      (flight_no, dep_airport_id, arr_airport_id, dep_time, arr_time, tail_number, emergency_id, fuel_usage))
     
     curs.close()
-    conn.commit()
+    prod_conn.commit()
 
 
 
 
 if __name__ == "__main__":
 
+    print(load_json_file_from_s3("jet_owners.json"))
 
-    airport_info = load_airport_info()
+
+    """airport_info = load_airport_info()
     aircraft_info = load_aircraft_info()
     jet_owners_info = load_jet_owners_info()
 
@@ -341,4 +355,4 @@ if __name__ == "__main__":
     insert_todays_flights(production_conn)
 
     production_conn.close()
-    staging_conn.close()
+    staging_conn.close()"""
