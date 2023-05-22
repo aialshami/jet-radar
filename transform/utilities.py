@@ -41,7 +41,7 @@ def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_
     Expects departure/arrival times as datetimes, the aircraft model code and aircraft info.
     """
 
-    flight_duration_hours = (arr_time - dep_time).hours
+    flight_duration_hours = (arr_time - dep_time).seconds / 60**2
     fuel_consumption_rate = aircraft_info[aircraft_model]["galph"]
 
     return flight_duration_hours * fuel_consumption_rate
