@@ -39,7 +39,7 @@ def get_db_connection(schema: str) -> connection:
                             options = f"-c search_path={schema}")
 
 
-def load_json_file_from_s3(file_name: str, bucket_name: str = BUCKET_NAME) -> object:
+def load_json_file_from_s3(file_name: str, bucket_name: str = BUCKET_NAME) -> list | dict:
     """Reads a json file from an s3 bucket and returns the object. Requires the names of the bucket
     and file as strings."""
 
@@ -81,6 +81,7 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
 
             if event_gap < 60*60 and i != num_of_events-1:
                 continue
+
             if i == num_of_events-1:
                 arr_time = current_event["time_input"]
                 arr_location = (current_event["lat"], current_event["lon"])
@@ -169,7 +170,7 @@ def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
             job_role_id = job_role_id[0]["job_role_id"]
 
         curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
-                        (owner_id, job_role_id))
+                    (owner_id, job_role_id))
         
 
 def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict[dict]) -> int:
