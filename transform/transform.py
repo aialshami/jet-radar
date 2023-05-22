@@ -8,12 +8,12 @@ from typing import Generator
 import country_converter as coco
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from psycopg2.extensions import connection
+from psycopg2.extensions import connection, cursor
 from dotenv import load_dotenv
 import pandas as pd
 from s3fs import S3FileSystem
 
-from utilities import find_nearest_airport, calculate_fuel_consumption
+from utilities import find_nearest_airport, calculate_fuel_consumption, clean_airport_data
 
 
 AIRPORTS_JSON = "airports.json"
@@ -55,7 +55,7 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
     and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
     df = pd.read_sql("SELECT * FROM tracked_event;", conn)
-    curs = conn.cursor(cursor_factory=RealDictCursor)
+    #curs = conn.cursor(cursor_factory=RealDictCursor)
 
     jets = df["aircraft_reg"].unique()
     for jet in jets:
@@ -155,6 +155,74 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     curs.close()
 
 
+def insert_job_roles(curs: cursor, job_roles: list[dict], owner_id: int) -> None:
+    """"""
+
+    for job_role in job_roles:
+        curs.execute("SELECT job_role_id FROM job_role WHERE name = %s", (job_role,))
+        job_role_id = curs.fetchall()
+        if not job_role_id:
+            curs.execute("INSERT INTO job_role (name) VALUES (%s) RETURNING job_role_id", (job_role,))
+            job_role_id = dict(curs.fetchall()[0])["job_role_id"]
+        else:
+            job_role_id = dict(job_role_id[0])["job_role_id"]
+
+        curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                        (owner_id, job_role_id))
+        
+
+def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict[dict]) -> int:
+    """Returns the id of the aircraft model if it exists in the dataset. Otherwise returns none."""
+
+    if not aircraft_model or aircraft_model not in aircraft_info:
+        return None
+
+    aircraft_model_name = aircraft_info[aircraft_model]["name"]
+    fuel_efficiency = aircraft_info[aircraft_model]["galph"]
+
+    curs.execute("SELECT model_id FROM model WHERE code = %s", (aircraft_model,))
+    model_id = curs.fetchall()
+    if model_id:
+        return dict(model_id[0])["model_id"]
+    
+    curs.execute("INSERT INTO model (code, name, fuel_efficiency) VALUES (%s, %s, %s) RETURNING model_id",
+                (aircraft_model, aircraft_model_name, fuel_efficiency))
+    return dict(curs.fetchall()[0])["model_id"]
+
+
+def get_aircraft_owner_id(curs: cursor, name: str, gender_id: int, est_net_worth: int, birthdate: datetime) -> int:
+    """Returns the jet owner id if it exists, otherwise inserts a new owner and returns their
+    owner id. Expects a cursor object connected to the production db as well as information about
+    the owner. Returns an integer."""
+
+    curs.execute("SELECT owner_id FROM owner WHERE name = %s", (name,))
+    owner_id = curs.fetchall()
+    if owner_id:
+        return dict(owner_id[0])["owner_id"]
+
+    curs.execute("""INSERT INTO owner (name, gender_id, est_net_worth, birthdate)
+                VALUES (%s, %s, %s, %s) RETURNING owner_id""",
+                (name, gender_id, est_net_worth, birthdate))
+    return dict(curs.fetchall()[0])["owner_id"]
+
+
+def get_gender_id(curs: cursor, gender: str) -> int:
+    """Returns appropriate gender id from db if it exists, otherwise inserts the gender and
+    returns the new gender id. Expects a cursor object connected to the production db and the gender
+    as a string. Gender id is an integer."""
+
+    if not gender:
+        return None
+    
+    curs.execute("SELECT gender_id FROM gender WHERE name = %s", (gender,))
+    gender_id = curs.fetchall()
+    if gender_id:
+        return dict(gender_id[0])["gender_id"]
+
+    curs.execute("INSERT INTO gender (name) VALUES (%s) RETURNING gender_id", (gender,))
+    return dict(curs.fetchall()[0])["gender_id"]
+
+
 def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info: list[dict]) -> None:
     """Inserts jet owner data."""
 
@@ -177,56 +245,16 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
         job_roles = owner["job_role"]
         aircraft_model = owner["aircraft_model"]
 
-        if gender:
-            curs.execute("SELECT gender_id FROM gender WHERE name = %s", (gender,))
-            gender_id = curs.fetchall()
-            if not gender_id:
-                curs.execute("INSERT INTO gender (name) VALUES (%s) RETURNING gender_id", (gender,))
-                gender_id = dict(curs.fetchall()[0])["gender_id"]
-            else:
-                gender_id = dict(gender_id[0])["gender_id"]
-        else:
-            gender_id = None
+        gender_id = get_gender_id(curs, gender)
 
-        curs.execute("SELECT owner_id FROM owner WHERE name = %s", (name,))
-        owner_id = curs.fetchall()
-        if not owner_id:
-            curs.execute("""INSERT INTO owner (name, gender_id, est_net_worth, birthdate)
-                         VALUES (%s, %s, %s, %s) RETURNING owner_id""",
-                         (name, gender_id, est_net_worth, birthdate))
-            owner_id = dict(curs.fetchall()[0])["owner_id"]
-        else:
-            owner_id = dict(owner_id[0])["owner_id"]
+        owner_id = get_aircraft_owner_id(curs, name, gender_id, est_net_worth, birthdate)
 
-        if aircraft_model:
-            aircraft_model_name = aircraft_info[aircraft_model]["name"]
-            fuel_efficiency = aircraft_info[aircraft_model]["galph"]
-
-            curs.execute("SELECT model_id FROM model WHERE code = %s", (aircraft_model,))
-            model_id = curs.fetchall()
-            if not model_id:
-                curs.execute("INSERT INTO model (code, name, fuel_efficiency) VALUES (%s, %s, %s) RETURNING model_id",
-                            (aircraft_model, aircraft_model_name, fuel_efficiency))
-                model_id = dict(curs.fetchall()[0])["model_id"]
-            else:
-                model_id = dict(model_id[0])["model_id"]
-        else:
-            model_id = None
+        model_id = get_aircraft_model_id(curs, aircraft_model, aircraft_info)
 
         curs.execute("INSERT INTO aircraft (tail_number, model_id, owner_id) VALUES (%s, %s, %s)",
                      (tail_number, model_id, owner_id))
 
-        for job_role in job_roles:
-            curs.execute("SELECT job_role_id FROM job_role WHERE name = %s", (job_role,))
-            job_role_id = curs.fetchall()
-            if not job_role_id:
-                curs.execute("INSERT INTO job_role (name) VALUES (%s) RETURNING job_role_id", (job_role,))
-                job_role_id = dict(curs.fetchall()[0])["job_role_id"]
-            else:
-                job_role_id = dict(job_role_id[0])["job_role_id"]
-
-            curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
-                         (owner_id, job_role_id))
+        insert_job_roles(curs, job_roles, owner_id)
 
     curs.close()
 
@@ -282,7 +310,7 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
 
 if __name__ == "__main__":
 
-    airport_data = load_json_file_from_s3(AIRPORTS_JSON)
+    airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON))
     aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)
     jet_owners_data = load_json_file_from_s3(JET_OWNERS_JSON)
 

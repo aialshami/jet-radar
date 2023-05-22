@@ -18,12 +18,20 @@ def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     return acos(sin(lat1_rad)*sin(lat2_rad) + cos(lat1_rad)*cos(lat2_rad)*cos(lon2_rad-lon1_rad)) * r
 
 
-def find_nearest_airport(lat: float, lon: float, airport_locations: dict) -> str:
+def clean_airport_data(airport_info: list[dict]) -> list[dict]:
+    """Removes airports that don't have latitude, longitude and iata information. Expects a list of dicts
+    and returns the filtered list."""
+
+    return [airport for airport in airport_info
+            if "lat" in airport and "lon" in airport and "iata" in airport]
+
+
+def find_nearest_airport(lat: float, lon: float, airport_info: list[dict]) -> str:
     """Finds closest airport to input latitude and longitude and returns the airport IATA code and
     location. Expects latitude and longitude as floats and a dictionary of airport locations."""
 
-    return sorted(airport_locations.items(),
-                  key=lambda x: haversine_distance(float(x[1]["lat"]), float(x[1]["lon"]), lat, lon))[0][0]
+    return sorted(airport_info,
+                  key=lambda x: haversine_distance(float(x["lat"]), float(x["lon"]), lat, lon))[0]["iata"]
 
 
 def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_model: str,
@@ -37,3 +45,9 @@ def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_
     fuel_consumption_rate = aircraft_info[aircraft_model]["galph"]
 
     return flight_duration_hours * fuel_consumption_rate
+
+
+
+
+if __name__ == "__main__":
+    pass
