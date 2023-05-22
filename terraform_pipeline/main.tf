@@ -10,6 +10,12 @@ terraform {
 }
 
 # Defining variables
+variable "rapidapi_host" {
+  type = string
+}
+variable "rapidapi_key" {
+  type = string
+}
 variable "aws_access_key" {
   type = string
 }
@@ -19,13 +25,31 @@ variable "aws_secret_key" {
 variable "username" {
   type = string
 }
+variable "db_name" {
+  type = string
+}
 variable "password" {
   type = string
+}
+variable "port" {
+  type = number
 }
 variable "region" {
   type = string
 }
 variable "account_id" {
+  type = string
+}
+variable "staging_table" {
+  type = string
+}
+variable "staging_schema" {
+  type = string
+}
+variable "production_schema" {
+  type = string
+}
+variable "celeb_info" {
   type = string
 }
 
