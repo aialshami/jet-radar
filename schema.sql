@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS "flight"(
     "arr_time" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
     "tail_number" VARCHAR(10) NOT NULL,
     "emergency_id" INTEGER NOT NULL,
-    "fuel_usage" FLOAT NOT NULL,
+    "fuel_usage" FLOAT,
     PRIMARY KEY("flight_id")
 );
 
