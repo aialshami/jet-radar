@@ -22,8 +22,8 @@ def clean_airport_data(airport_info: list[dict]) -> list[dict]:
     """Removes airports that don't have latitude, longitude and iata information. Expects a list of dicts
     and returns the filtered list."""
 
-    return [{airport["iata"]: airport} for airport in airport_info
-            if "lat" in airport and "lon" in airport and "iata" in airport]
+    return {airport["iata"]: airport for airport in airport_info
+            if "lat" in airport and "lon" in airport and "iata" in airport}
 
 
 def find_nearest_airport(lat: float, lon: float, airport_info: list[dict]) -> str:
