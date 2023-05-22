@@ -32,7 +32,7 @@ def get_db_connection(schema: str) -> connection:
 
     return psycopg2.connect(user = config["DB_USER"],
                             password = config["DB_PASSWORD"],
-                            host = config["DB_HOST"],
+                            host = config["DB_HOST"][:-5],
                             port = config["DB_PORT"],
                             database = config["DB_NAME"],
                             options = f"-c search_path={schema}")
@@ -331,3 +331,9 @@ def handler(event, context) -> None:
 
     production_conn.close()
     staging_conn.close()
+
+
+
+
+if __name__ == "__main__":
+    pass
