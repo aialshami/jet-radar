@@ -1,8 +1,8 @@
-"""This script reads tracked events from the staging database, and inserts the parsed flight information
+"""This module reads tracked events from the staging database, and inserts the parsed flight information
 into the production database using airports data, aircraft data and tracked owners data stored in s3."""
 import json
 import os
-from math import sin, cos, acos, pi
+#from math import sin, cos, acos, pi
 from datetime import datetime
 from typing import Generator
 import country_converter as coco
@@ -12,6 +12,8 @@ from psycopg2.extensions import connection
 from dotenv import load_dotenv
 import pandas as pd
 from s3fs import S3FileSystem
+
+from utilities import find_nearest_airport, calculate_fuel_consumption
 
 
 AIRPORTS_JSON = "airports.json"
@@ -46,41 +48,6 @@ def load_json_file_from_s3(file_name: str, bucket_name: str = BUCKET_NAME) -> ob
                       secret=config["SECRET_ACCESS_KEY"])
 
     return json.load(s3.open(path=f"{bucket_name}/{file_name}"))
-
-
-def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Calculates distance in km between two locations. The latitudes and longitudes are 
-    converted to radians and the distance is calculated using the Haversine formula. 
-    r is the radius of the earth. Expects floats and returns a float."""
-
-    r = 6371
-    lat1_rad = lat1 * pi/180
-    lat2_rad = lat2 * pi/180
-    lon1_rad = lon1 * pi/180
-    lon2_rad = lon2 * pi/180
-
-    return acos(sin(lat1_rad)*sin(lat2_rad) + cos(lat1_rad)*cos(lat2_rad)*cos(lon2_rad-lon1_rad)) * r
-
-
-def find_nearest_airport(lat: float, lon: float, airport_locations: dict) -> str:
-    """Finds closest airport to input latitude and longitude and returns the airport IATA code and
-    location. Expects latitude and longitude as floats and a dictionary of airport locations."""
-
-    return sorted(airport_locations.items(),
-                  key=lambda x: haversine_distance(float(x[1]["lat"]), float(x[1]["lon"]), lat, lon))[0][0]
-
-
-def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_model: str,
-                               aircraft_info: dict[dict]) -> float:
-    """Calculates fuel consumption by multiplying the flight duration in hours by the estimated 
-    fuel consumption of the aircraft. Returns this as a float in gallons (galph = gallons per hour). 
-    Expects departure/arrival times as datetimes, the aircraft model code and aircraft info.
-    """
-
-    flight_duration_hours = (arr_time - dep_time).hours
-    fuel_consumption_rate = aircraft_info[aircraft_model]["galph"]
-
-    return flight_duration_hours * fuel_consumption_rate
 
 
 def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
@@ -124,15 +91,15 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
                     break
 
                 yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
-                             (jet, arr_time))
+                #curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
+                             #(jet, arr_time))
             else:
                 arr_time = previous_event["time_input"]
                 arr_location = (previous_event["lat"], previous_event["lon"])
 
                 yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
-                             (jet, arr_time))
+                #curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
+                             #(jet, arr_time))
 
                 dep_time = current_event["time_input"]
                 dep_location = (current_event["lat"], current_event["lon"])
