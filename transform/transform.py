@@ -123,13 +123,13 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         iata = airport_info[airport]["iata"]
         lat = airport_info[airport]["lat"]
         lon = airport_info[airport]["lon"]
-        try:
-            country = airport_info[airport]["iso"]
-            country_name = cc.convert(names=country, to="name_short")
-            continent_name = cc.convert(names=country, to="continent")
-            continent = continent_codes[continent_name]
-        except Exception:
+
+        country = airport_info[airport]["iso"]
+        country_name = cc.convert(names=country, to="name_short")
+        continent_name = cc.convert(names=country, to="continent")
+        if country_name == "not found" or continent_name == "not found":
             continue
+        continent = continent_codes[continent_name]
 
         curs.execute("SELECT country_id FROM country WHERE code = %s", (country,))
         country_id = curs.fetchall()
@@ -140,19 +140,20 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
             if not continent_id:
                 curs.execute("INSERT INTO continent (code, name) VALUES (%s, %s) RETURNING continent_id",
                              (continent, continent_name))
-                continent_id = dict(curs.fetchall()[0])["continent_id"]
+                continent_id = curs.fetchall()[0]["continent_id"]
             else:
-                continent_id = dict(continent_id[0])["continent_id"]
+                continent_id = continent_id[0]["continent_id"]
             curs.execute("INSERT INTO country (code, name, continent_id) VALUES (%s, %s, %s) RETURNING country_id",
                          (country, country_name, continent_id))
-            country_id = dict(curs.fetchall()[0])["country_id"]
+            country_id = curs.fetchall()[0]["country_id"]
         else:
-            country_id = dict(country_id[0])["country_id"]
+            country_id = country_id[0]["country_id"]
 
         curs.execute("INSERT INTO airport (name, iata, lat, lon, country_id) VALUES (%s, %s, %s, %s, %s)",
                      (name, iata, lat, lon, country_id))
 
     curs.close()
+    conn.commit()
 
 
 def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
@@ -164,9 +165,9 @@ def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
         job_role_id = curs.fetchall()
         if not job_role_id:
             curs.execute("INSERT INTO job_role (name) VALUES (%s) RETURNING job_role_id", (job_role,))
-            job_role_id = dict(curs.fetchall()[0])["job_role_id"]
+            job_role_id = curs.fetchall()[0]["job_role_id"]
         else:
-            job_role_id = dict(job_role_id[0])["job_role_id"]
+            job_role_id = job_role_id[0]["job_role_id"]
 
         curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
                         (owner_id, job_role_id))
@@ -184,11 +185,11 @@ def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict
     curs.execute("SELECT model_id FROM model WHERE code = %s", (aircraft_model,))
     model_id = curs.fetchall()
     if model_id:
-        return dict(model_id[0])["model_id"]
+        return model_id[0]["model_id"]
     
     curs.execute("INSERT INTO model (code, name, fuel_efficiency) VALUES (%s, %s, %s) RETURNING model_id",
                 (aircraft_model, aircraft_model_name, fuel_efficiency))
-    return dict(curs.fetchall()[0])["model_id"]
+    return curs.fetchall()[0]["model_id"]
 
 
 def get_aircraft_owner_id(curs: cursor, name: str, gender_id: int, est_net_worth: int, birthdate: datetime) -> int:
@@ -199,12 +200,12 @@ def get_aircraft_owner_id(curs: cursor, name: str, gender_id: int, est_net_worth
     curs.execute("SELECT owner_id FROM owner WHERE name = %s", (name,))
     owner_id = curs.fetchall()
     if owner_id:
-        return dict(owner_id[0])["owner_id"]
+        return owner_id[0]["owner_id"]
 
     curs.execute("""INSERT INTO owner (name, gender_id, est_net_worth, birthdate)
                 VALUES (%s, %s, %s, %s) RETURNING owner_id""",
                 (name, gender_id, est_net_worth, birthdate))
-    return dict(curs.fetchall()[0])["owner_id"]
+    return curs.fetchall()[0]["owner_id"]
 
 
 def get_gender_id(curs: cursor, gender: str) -> int:
@@ -218,10 +219,10 @@ def get_gender_id(curs: cursor, gender: str) -> int:
     curs.execute("SELECT gender_id FROM gender WHERE name = %s", (gender,))
     gender_id = curs.fetchall()
     if gender_id:
-        return dict(gender_id[0])["gender_id"]
+        return gender_id[0]["gender_id"]
 
     curs.execute("INSERT INTO gender (name) VALUES (%s) RETURNING gender_id", (gender,))
-    return dict(curs.fetchall()[0])["gender_id"]
+    return curs.fetchall()[0]["gender_id"]
 
 
 def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_info: list[dict]) -> None:
@@ -258,6 +259,7 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
         insert_job_roles(curs, job_roles, owner_id)
 
     curs.close()
+    conn.commit()
 
 
 def insert_todays_flights(prod_conn: connection, stage_conn: connection,
@@ -270,6 +272,9 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
         tail_number, flight_no, dep_time, dep_location, arr_time, arr_location, emergency = flight
 
         print(tail_number)
+        curs.execute("SELECT * FROM aircraft WHERE tail_number = %s", (tail_number,))
+        if not curs.fetchall():
+            continue
 
         dep_airport = find_nearest_airport(*dep_location, airport_info)
         arr_airport = find_nearest_airport(*arr_location, airport_info)
@@ -277,28 +282,28 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
             continue
 
         curs.execute("SELECT airport_id FROM airport WHERE iata = %s", (dep_airport,))
-        dep_airport_id = dict(curs.fetchall()[0])["airport_id"]
+        dep_airport_id = curs.fetchall()[0]["airport_id"]
         curs.execute("SELECT airport_id FROM airport WHERE iata = %s", (arr_airport,))
-        arr_airport_id = dict(curs.fetchall()[0])["airport_id"]
+        arr_airport_id = curs.fetchall()[0]["airport_id"]
 
         curs.execute("""SELECT code FROM model JOIN aircraft ON model.model_id = aircraft.model_id
                      WHERE aircraft.tail_number = %s""", (tail_number,))
         aircraft_model = curs.fetchall()
         if aircraft_model:
-            aircraft_model = dict(aircraft_model[0])["code"]
+            aircraft_model = aircraft_model[0]["code"]
             fuel_usage = calculate_fuel_consumption(dep_time, arr_time, aircraft_model, aircraft_info)
         else:
             fuel_usage = None
 
+        if not emergency:
+            emergency = "none"
         curs.execute("SELECT emergency_id FROM emergency WHERE type = %s", (emergency,))
         emergency_id = curs.fetchall()
         if not emergency_id:
             curs.execute("INSERT INTO emergency (type) VALUES (%s) RETURNING emergency_id", (emergency,))
-            emergency_id = dict(curs.fetchall()[0])["emergency_id"]
+            emergency_id = curs.fetchall()[0]["emergency_id"]
         else:
-            emergency_id = dict(emergency_id[0])["emergency_id"]
-
-        print(emergency_id)
+            emergency_id = emergency_id[0]["emergency_id"]
 
         curs.execute("""INSERT INTO flight (flight_number, dep_airport_id, arr_airport_id, dep_time, arr_time, tail_number,
                      emergency_id, fuel_usage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
