@@ -2,7 +2,6 @@
 into the production database using airports data, aircraft data and tracked owners data stored in s3."""
 import json
 import os
-#from math import sin, cos, acos, pi
 from datetime import datetime
 from typing import Generator
 import country_converter as coco
