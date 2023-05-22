@@ -15,36 +15,35 @@ from s3fs import S3FileSystem
 from utilities import find_nearest_airport, calculate_fuel_consumption, clean_airport_data
 
 
-AIRPORTS_JSON = "airports.json"
-AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
-JET_OWNERS_JSON = "celeb_planes.json"
-BUCKET_NAME = "jet-bucket"
-STAGING_SCHEMA = "staging"
-PRODUCTION_SCHEMA = "production"
-
-
 load_dotenv()
 config = os.environ
+
+
+AIRPORTS_JSON = "airports.json"
+AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
+JET_OWNERS_JSON = config["CELEB_INFO"]
+STAGING_SCHEMA = config["STAGING_SCHEMA"]
+PRODUCTION_SCHEMA = config["PRODUCTION_SCHEMA"]
 
 
 def get_db_connection(schema: str) -> connection:
     """Establishes connection to database. Returns psycopg2 connection object.
     Expects schema name as string."""
 
-    return psycopg2.connect(user = config["DATABASE_USERNAME"],
-                            password = config["DATABASE_PASSWORD"],
-                            host = config["DATABASE_IP"],
-                            port = config["DATABASE_PORT"],
-                            database = config["DATABASE_NAME"],
+    return psycopg2.connect(user = config["DB_USER"],
+                            password = config["DB_PASSWORD"],
+                            host = config["DB_HOST"],
+                            port = config["DB_PORT"],
+                            database = config["DB_NAME"],
                             options = f"-c search_path={schema}")
 
 
-def load_json_file_from_s3(file_name: str, bucket_name: str = BUCKET_NAME) -> list | dict:
+def load_json_file_from_s3(file_name: str, bucket_name: str = config["S3_BUCKET_NAME"]) -> list | dict:
     """Reads a json file from an s3 bucket and returns the object. Requires the names of the bucket
     and file as strings."""
 
-    s3 = S3FileSystem(key=config["ACCESS_KEY_ID"],
-                      secret=config["SECRET_ACCESS_KEY"])
+    s3 = S3FileSystem(key=config["ACCESS_KEY"],
+                      secret=config["SECRET_KEY"])
 
     return json.load(s3.open(path=f"{bucket_name}/{file_name}"))
 
