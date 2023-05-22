@@ -22,7 +22,7 @@ def clean_airport_data(airport_info: list[dict]) -> list[dict]:
     """Removes airports that don't have latitude, longitude and iata information. Expects a list of dicts
     and returns the filtered list."""
 
-    return [airport for airport in airport_info
+    return [{airport["iata"]: airport} for airport in airport_info
             if "lat" in airport and "lon" in airport and "iata" in airport]
 
 
@@ -30,8 +30,8 @@ def find_nearest_airport(lat: float, lon: float, airport_info: list[dict]) -> st
     """Finds closest airport to input latitude and longitude and returns the airport IATA code and
     location. Expects latitude and longitude as floats and a dictionary of airport locations."""
 
-    return sorted(airport_info,
-                  key=lambda x: haversine_distance(float(x["lat"]), float(x["lon"]), lat, lon))[0]["iata"]
+    return sorted(airport_info.items(),
+                  key=lambda x: haversine_distance(float(x[1]["lat"]), float(x[1]["lon"]), lat, lon))[0][0]
 
 
 def calculate_fuel_consumption(dep_time: datetime, arr_time: datetime, aircraft_model: str,

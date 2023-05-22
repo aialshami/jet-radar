@@ -155,8 +155,9 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     curs.close()
 
 
-def insert_job_roles(curs: cursor, job_roles: list[dict], owner_id: int) -> None:
-    """"""
+def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
+    """Inserts an owners jobs/occupations into db. Expects a cursor object connect to production,
+    a list of jobs and the owner id as an int. Returns none."""
 
     for job_role in job_roles:
         curs.execute("SELECT job_role_id FROM job_role WHERE name = %s", (job_role,))
