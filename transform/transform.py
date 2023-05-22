@@ -17,7 +17,7 @@ from utilities import find_nearest_airport, calculate_fuel_consumption, clean_ai
 
 AIRPORTS_JSON = "airports.json"
 AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
-JET_OWNERS_JSON = "jet_owners.json"
+JET_OWNERS_JSON = "celeb_planes.json"
 BUCKET_NAME = "jet-bucket"
 STAGING_SCHEMA = "staging"
 PRODUCTION_SCHEMA = "production"
@@ -153,7 +153,6 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
                      (name, iata, lat, lon, country_id))
 
     curs.close()
-    conn.commit()
 
 
 def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
@@ -173,7 +172,7 @@ def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
                     (owner_id, job_role_id))
         
 
-def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict[dict]) -> int:
+def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict[dict]) -> int | None:
     """Returns the id of the aircraft model if it exists in the dataset. Otherwise returns none."""
 
     if not aircraft_model or aircraft_model not in aircraft_info:
@@ -208,7 +207,7 @@ def get_aircraft_owner_id(curs: cursor, name: str, gender_id: int, est_net_worth
     return curs.fetchall()[0]["owner_id"]
 
 
-def get_gender_id(curs: cursor, gender: str) -> int:
+def get_gender_id(curs: cursor, gender: str) -> int | None:
     """Returns appropriate gender id from db if it exists, otherwise inserts the gender and
     returns the new gender id. Expects a cursor object connected to the production db and the gender
     as a string. Gender id is an integer."""
@@ -259,7 +258,6 @@ def insert_jet_owner_info(conn: connection, aircraft_info: dict[dict], owner_inf
         insert_job_roles(curs, job_roles, owner_id)
 
     curs.close()
-    conn.commit()
 
 
 def insert_todays_flights(prod_conn: connection, stage_conn: connection,
@@ -314,7 +312,7 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
 
 
 
-if __name__ == "__main__":
+def handler(event, context) -> None:
 
     airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON))
     aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)

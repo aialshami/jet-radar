@@ -18,7 +18,7 @@ def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     return acos(sin(lat1_rad)*sin(lat2_rad) + cos(lat1_rad)*cos(lat2_rad)*cos(lon2_rad-lon1_rad)) * r
 
 
-def clean_airport_data(airport_info: list[dict]) -> list[dict]:
+def clean_airport_data(airport_info: list[dict]) -> dict[dict]:
     """Removes airports that don't have latitude, longitude and iata information. Expects a list of dicts
     and returns the filtered list."""
 
