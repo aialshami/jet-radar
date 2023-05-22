@@ -101,6 +101,6 @@ def handler(event, context) -> None:
     flight_df = convert_flight_list_to_df(flight_data)
 
     # Pushes to staging DB
-    push_to_staging_database(config, flight_df)
-
-    return flight_df.to_json()
+    if not flight_df.empty:
+        push_to_staging_database(config, flight_df)
+        return flight_df.to_json()
