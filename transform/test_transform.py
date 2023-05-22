@@ -29,8 +29,15 @@ def test_find_nearest_airport_WKK(airport_data):
     assert find_nearest_airport(59.3, -158.61, airport_data) == "WKK"
 
 
-def test_fuel_usage(aircraft_data):
+def test_fuel_usage_of_LJ40_over_one_hour(aircraft_data):
     """"""
     test_dep_time = datetime.now() - timedelta(hours=1)
     test_arr_time = datetime.now()
     assert calculate_fuel_consumption(test_dep_time, test_arr_time, "LJ40", aircraft_data) == 207
+
+
+def test_fuel_usage_of_GA5C(aircraft_data):
+    """"""
+    test_dep_time = datetime.now() - timedelta(hours=7, minutes=42, seconds=87)
+    test_arr_time = datetime.now()
+    assert round(calculate_fuel_consumption(test_dep_time, test_arr_time, "GA5C", aircraft_data)) == 3105
