@@ -13,6 +13,12 @@ disable =
     unused-argument,
     import-error
 
+
+[pylint.format]
+#Set the maximum line length to 120 characters.
+max-line-length = 120
+
+
 # Additional configurations.
 suggestion-mode = yes
 fail-under = 8.5
