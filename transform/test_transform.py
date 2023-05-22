@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from psycopg2.extensions import connection
 from transform import *
 from utilities import haversine_distance, find_nearest_airport, calculate_fuel_consumption
 
@@ -41,3 +42,13 @@ def test_fuel_usage_of_GA5C(aircraft_data):
     test_dep_time = datetime.now() - timedelta(hours=7, minutes=42, seconds=87)
     test_arr_time = datetime.now()
     assert round(calculate_fuel_consumption(test_dep_time, test_arr_time, "GA5C", aircraft_data)) == 3105
+
+
+def test_staging_db_connection(staging_db_connection):
+    """"""
+    assert isinstance(staging_db_connection, connection)
+
+
+def test_production_db_connection(production_db_connection):
+    """"""
+    assert isinstance(production_db_connection, connection)
