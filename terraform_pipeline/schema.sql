@@ -1,15 +1,50 @@
-DROP TABLE IF EXISTS "flights";
-DROP TABLE IF EXISTS "owner_role_link";
-DROP TABLE IF EXISTS "aircraft";
-DROP TABLE IF EXISTS "model";
-DROP TABLE IF EXISTS "owner";
-DROP TABLE IF EXISTS "gender";
-DROP TABLE IF EXISTS "job_role";
-DROP TABLE IF EXISTS "gender";
-DROP TABLE IF EXISTS "airport";
-DROP TABLE IF EXISTS "country";
-DROP TABLE IF EXISTS "continent";
+-- Drop schemas if they exist (DEVELOPMENT)
+DROP SCHEMA IF EXISTS staging CASCADE;
+DROP SCHEMA IF EXISTS production CASCADE;
 
+-- Create schemas
+CREATE SCHEMA staging;
+CREATE SCHEMA production;
+
+-- Select staging schema
+SET search_path TO staging;
+
+-- Build staging schema tables
+CREATE TABLE "tracked_event"(
+    "event_id" INTEGER GENERATED ALWAYS AS IDENTITY,
+    "time_input" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+    "flight_no" VARCHAR(10) NOT NULL,
+    "aircraft_reg" VARCHAR(10) NOT NULL,
+    "model" VARCHAR(10) NOT NULL,
+    "borometric_alt" INTEGER NOT NULL,
+    "geometric_alt" INTEGER NOT NULL,
+    "ground_speed" FLOAT NOT NULL,
+    "true_track" FLOAT NOT NULL,
+    "barometric_alt_roc" FLOAT NOT NULL,
+    "emergency" TEXT NOT NULL,
+    "lat" FLOAT NOT NULL,
+    "lon" FLOAT NOT NULL,
+    PRIMARY KEY("event_id")
+   );
+
+
+-- Select production schema
+SET search_path TO production;
+
+-- Build production schema tables
+DROP SCHEMA IF EXISTS production CASCADE;
+
+CREATE SCHEMA production;
+
+-- Select production schema
+SET search_path TO production;
+
+-- Build production schema tables
+CREATE TABLE IF NOT EXISTS "emergency"(
+    "emergency_id" INTEGER GENERATED ALWAYS AS IDENTITY,
+    "type" VARCHAR(20) NOT NULL UNIQUE,
+    PRIMARY KEY("emergency_id")
+);
 
 CREATE TABLE IF NOT EXISTS "gender"(
     "gender_id" INTEGER GENERATED ALWAYS AS IDENTITY,
@@ -46,7 +81,7 @@ CREATE TABLE IF NOT EXISTS "continent"(
 
 CREATE TABLE IF NOT EXISTS "airport"(
     "airport_id" INTEGER GENERATED ALWAYS AS IDENTITY,
-    "name" VARCHAR(100) NOT NULL,
+    "name" VARCHAR(100),
     "iata" VARCHAR(3) NOT NULL UNIQUE,
     "lat" FLOAT NOT NULL,
     "lon" FLOAT NOT NULL,
@@ -54,38 +89,40 @@ CREATE TABLE IF NOT EXISTS "airport"(
     PRIMARY KEY("airport_id")
 );
 
-CREATE TABLE IF NOT EXISTS "flights"(
+CREATE TABLE IF NOT EXISTS "flight"(
     "flight_id" INTEGER GENERATED ALWAYS AS IDENTITY,
     "flight_number" VARCHAR(10) NOT NULL,
     "dep_airport_id" INTEGER NOT NULL,
     "arr_airport_id" INTEGER NOT NULL,
     "dep_time" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
     "arr_time" TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL,
-    "aircraft_id" INTEGER NOT NULL,
+    "tail_number" VARCHAR(10) NOT NULL,
+    "emergency_id" INTEGER NOT NULL,
+    "fuel_usage" FLOAT,
     PRIMARY KEY("flight_id")
 );
 
 CREATE TABLE IF NOT EXISTS "aircraft"(
-    "aircraft_id" INTEGER GENERATED ALWAYS AS IDENTITY,
+    "tail_number" VARCHAR(10) NOT NULL UNIQUE,
     "model_id" INTEGER NOT NULL,
     "owner_id" INTEGER NOT NULL,
-    UNIQUE("aircraft_id", "model_id", "owner_id"),
-    PRIMARY KEY("aircraft_id")
+    UNIQUE("tail_number", "model_id", "owner_id"),
+    PRIMARY KEY("tail_number")
 );
 
 CREATE TABLE IF NOT EXISTS "owner"(
     "owner_id" INTEGER GENERATED ALWAYS AS IDENTITY,
     "name" VARCHAR(60) NOT NULL,
-    "gender_id" INTEGER NOT NULL,
-    "est_net_worth" BIGINT NOT NULL,
-    "birthdate" DATE NOT NULL,
+    "gender_id" INTEGER,
+    "est_net_worth" BIGINT,
+    "birthdate" DATE,
     PRIMARY KEY("owner_id")
 );
 
 CREATE TABLE IF NOT EXISTS "model"(
     "model_id" INTEGER GENERATED ALWAYS AS IDENTITY,
-    "name" VARCHAR(50) NOT NULL,
-    "capacity" INTEGER NOT NULL,
+    "code" VARCHAR(5) NOT NULL,
+    "name" VARCHAR(50),
     "fuel_efficiency" FLOAT NOT NULL,
     PRIMARY KEY("model_id")
 );
@@ -97,11 +134,13 @@ ALTER TABLE
 ALTER TABLE
     "owner" ADD CONSTRAINT "owner_gender_id_foreign" FOREIGN KEY("gender_id") REFERENCES "gender"("gender_id");
 ALTER TABLE
-    "flights" ADD CONSTRAINT "flights_arr_airport_id_foreign" FOREIGN KEY("arr_airport_id") REFERENCES "airport"("airport_id");
+    "flight" ADD CONSTRAINT "flight_arr_airport_id_foreign" FOREIGN KEY("arr_airport_id") REFERENCES "airport"("airport_id");
 ALTER TABLE
-    "flights" ADD CONSTRAINT "flights_dep_airport_id_foreign" FOREIGN KEY("dep_airport_id") REFERENCES "airport"("airport_id");
+    "flight" ADD CONSTRAINT "flight_dep_airport_id_foreign" FOREIGN KEY("dep_airport_id") REFERENCES "airport"("airport_id");
 ALTER TABLE
-    "flights" ADD CONSTRAINT "flights_aircraft_id_foreign" FOREIGN KEY("aircraft_id") REFERENCES "aircraft"("aircraft_id");
+    "flight" ADD CONSTRAINT "flight_tail_num_foreign" FOREIGN KEY("tail_number") REFERENCES "aircraft"("tail_number");
+ALTER TABLE
+    "flight" ADD CONSTRAINT "flight_emergency_id_foreign" FOREIGN KEY("emergency_id") REFERENCES "emergency"("emergency_id");
 ALTER TABLE
     "country" ADD CONSTRAINT "country_continent_id_foreign" FOREIGN KEY("continent_id") REFERENCES "continent"("continent_id");
 ALTER TABLE

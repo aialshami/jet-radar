@@ -2,7 +2,6 @@
 resource "aws_db_instance" "jet_db" {
   identifier        = "jet-db"
   engine            = "postgres"
-  engine_version    = "14.1"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
   username          = var.username
