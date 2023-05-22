@@ -52,3 +52,12 @@ def test_staging_db_connection(staging_db_connection):
 def test_production_db_connection(production_db_connection):
     """"""
     assert isinstance(production_db_connection, connection)
+
+
+def test_load_airport_data_from_s3(airport_data):
+    """"""
+    assert isinstance(airport_data, dict) and "iata" in list(airport_data.values())[0]
+
+def test_load_aircraft_data_from_s3(aircraft_data):
+    """"""
+    assert isinstance(aircraft_data, dict) and "galph" in list(aircraft_data.values())[0]
