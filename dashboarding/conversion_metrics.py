@@ -6,6 +6,16 @@ import numpy as np
 from numpy import random
 
 
+CELEB_DROPDOWN_OPTIONS=[{"label": "Elon Musk", "value": "elon_musk",}, {"label": "Tom Cruise", "value": "tom_cruise",},
+                        {"label": "Oprah Winfrey","value": "oprah_winfrey",}, {"label": "Floyd Mayweather", "value": "floyd_mayweather",},
+                        {"label": "Taylor Swift", "value": "taylor_swift",}, {"label": "Bill Gates", "value": "bill_gates",},
+                        {"label": "Kim Kardashian", "value": "kim_kardashian",}, {"label": "Travis Scott", "value": "travis_scott",},
+                        {"label": "Kylie Jenner", "value": "kylie_jenner",}, {"label": "Donald Trump", "value": "donald_trump",},
+                        {"label": "Jim Carrey", "value": "jim_carrey",}, {"label": "John Travolta", "value": "john_travolta",},
+                        {"label": "Jay-Z", "value": "jay_z",}, {"label": "Steven Spielberg", "value": "steven_spielberg",}, 
+                        {"label": "Mark Wahlberg", "value": "mark_wahlberg",}, {"label": "A-Rod", "value": "a_rod",},
+                        ]
+
 UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9", 
            "tree": "\U0001F333", "sun": "\U0001F324", "football": "\U000026BD",
            "watch":"\U000023F1", "music":"\U0001F3B5", "phone": "\U0001F4F1",
@@ -18,12 +28,13 @@ AVG_CO2_COMMUTE = 0.00496 #mtCo2 src: https://www.climatepartner.com/en/news/how
 def infographic_co2(metric_ton_co2: float) -> str:
     """ Converts the CO2 of a flight to a an infographic metric """
     metric = random.choice(['commute', "trees", "normal_flights"])
+
     if metric == "commute":
-        print("commute")
+        return "commute"
     elif metric == "trees":
-        print("trees")
+        return "trees"
     elif metric == "normal_flights":
-        print("comapre to commercial flights")
+        return "comapre to commercial flights"
     else:
         raise ValueError("Something went seriously wrong with the random")
 
