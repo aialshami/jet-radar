@@ -80,8 +80,8 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
             emergency = flight[-1]["emergency"]
 
             yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-            curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
-                        (jet, arr_time))
+            curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND flight_no = %s",
+                        (jet, flight_no))
 
 
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
