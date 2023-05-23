@@ -3,9 +3,30 @@ import pandas as pd
 from datetime import datetime
 from math import floor
 import numpy as np
+from numpy import random
 
+
+UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9", 
+           "tree": "\U0001F333", "sun": "\U0001F324", "football": "\U000026BD",
+           "watch":"\U000023F1", "music":"\U0001F3B5", "phone": "\U0001F4F1",
+           "money":"\U0001F4B0", "film":"\U0001F3A5", "sweets":"\U0001F36C", 
+           "shopping": "\U0001F6D2", "tea":"\U00002615", "beer": "\U0001F37A"}
 
 co2_per_gallon_fuel = 0.01 #mtCO2 i.e metric tons of co2
+AVG_CO2_COMMUTE = 0.00496 #mtCo2 src: https://www.climatepartner.com/en/news/how-sustainable-commuting-can-improve-a-company-carbon-footprint#:~:text=Due%20to%20its%20significant%20impact,per%20commuting%20employee%20per%20day.
+
+def infographic_co2(metric_ton_co2: float) -> str:
+    """ Converts the CO2 of a flight to a an infographic metric """
+    metric = random.choice(['commute', "trees", "normal_flights"])
+    if metric == "commute":
+        print("commute")
+    elif metric == "trees":
+        print("trees")
+    elif metric == "normal_flights":
+        print("comapre to commercial flights")
+    else:
+        raise ValueError("Something went seriously wrong with the random")
+
 
 
 def get_age_from_birthdate(birthdate: str) -> int:

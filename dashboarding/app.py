@@ -34,8 +34,8 @@ flight_df = get_data_as_dataframe(sql_conn, "flight")
 gender_df = get_data_as_dataframe(sql_conn, "gender")
 
 # Derive display values for celeb
-owner = owner_df[owner_df["name"] == "Floyd Mayweather"]
-name, age = 'Floyd Mayweather', get_age_from_birthdate(owner["birthdate"].values[0])
+owner = owner_df[owner_df["name"] == "Elon Musk"]
+name, age = 'Elon Musk', get_age_from_birthdate(owner["birthdate"].values[0])
 print(name, age)
 gender = get_gender_from_id(owner["gender_id"].values[0], gender_df)
 worth = get_net_worth_as_million_dollars(owner['est_net_worth'].values[0])

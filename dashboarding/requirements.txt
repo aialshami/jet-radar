@@ -11,3 +11,4 @@ seaborn
 dash_bootstrap_components
 plotly.express
 cufflinks
+requests
