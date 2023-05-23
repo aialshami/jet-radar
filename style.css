@@ -1,0 +1,275 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display');
+
+/* Remove graph toolbars */
+.modebar{
+    display: none !important;
+}
+/* Base Styles*/
+html {
+    font-size: 50%;
+    background-color: #1f2630;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0;
+}
+
+body {
+    font-size: 1.5rem; /* currently ems cause chrome bug misinterpreting rems on body element */
+    line-height: 1.6;
+    font-weight: 400;
+    font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #7fafdf;
+    margin: 0;
+}
+
+#root {
+    margin: 0;
+    background-color: #1f2630;
+    padding: 5rem;
+}
+
+#app-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    height: 100rem;
+    margin-bottom: 5rem;
+}
+
+/*Column definitions*/
+#celeb-column {
+    margin-right: 5rem;
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-content: center;
+}
+#center-column {
+    margin-left: 1%;
+    margin-right: 1.5%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-content: center;
+}
+#map-column {
+    margin-right: 1%;
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+
+/*Inside celeb column*/
+#celeb-img {
+    max-height: 60%;
+    max-width: 100%;
+}
+#celeb-info{
+    background-color: #252e3f;
+    margin-top: 2rem;
+    height: 18%;
+}
+#celeb-info-list{
+    max-width: 150%;
+    max-height: 100%;
+}
+#celeb-info-text {
+    margin-bottom: 2rem !important;
+    font-size: 2rem;
+}
+
+
+#flights-tracked-container{
+    background-color: #252e3f;
+    margin-top: 5rem;
+    margin-bottom: 0rem;
+    height: 10%;
+    text-align: center;
+}
+#num-flights-tracked{
+    max-width:75%;
+    max-height:50%;
+    font-size: medium;
+}
+
+
+/*Inside center column NOTE: title is covered by H4*/
+#description {
+    font-size: 1.5rem;
+    border-left: #2cfec1 solid 1rem;
+    padding-left: 1rem;
+    max-width: 100rem;
+    margin: 2rem 0 3rem 0;
+}
+#flight-info-box {
+    height:15%;
+    margin-top: 2rem;
+    background-color: #252e3f;
+}
+.container {
+    display: flex;
+    flex-flow: row wrap;
+    height: 20%;
+    width: 100%;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+}
+.box {
+    flex: 1 0 50%;
+    max-width: 40%; 
+    max-height: 50%;
+    text-align: center;
+    font-size: medium;
+}
+#infographic-box {
+    height:10%;
+    margin-top: 2rem;
+    background-color: #252e3f;
+}
+#infographic-text{
+    max-width: 75%;
+}
+#small-analytics-container {
+    height:25%;
+    margin-top: 2rem;
+    align-content: center;
+    border: #2cfec1 solid 2px;
+    position: relative;
+}
+#co2-graph-container {
+    float:left;
+    width: 47%;
+    height:100%;
+    background-color: #252e3f;
+
+}
+#co2-graph{
+    height:100%
+}
+#cost-graph-container {
+    float: right;
+    width: 47%;
+    height:100%;
+    background-color: #252e3f;
+    
+}
+#cost-graph{
+    height:100%
+}
+
+
+/*Inside flight-map column*/
+#map-container-vert-pad {
+    max-height: 40rem;
+}
+#slider-container {
+    background-color: #252e3f;
+    padding: 1rem 3rem 1rem 3rem;
+    height: 10%;
+    margin: 2rem;
+}
+#flight-map-container {
+    height:30%;
+    background-color: #252e3f;
+    margin:2rem;
+}
+#graph-flights-over-time{
+    height:25%;
+    background-color: #252e3f;
+    margin:2rem;
+}
+#flights-vs-time-graph, #flight-map{
+    height:100%;
+}
+#slider-text, #chart-selector {
+    margin-bottom: 2rem !important;
+    font-size: 2rem;
+}
+
+
+/* Typography
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-weight: 300;
+}
+
+h1 {
+    font-size: 4.5rem;
+    line-height: 1.2;
+    letter-spacing: -.1rem;
+    margin-bottom: 2rem;
+}
+
+h2 {
+    font-size: 3.6rem;
+    line-height: 1.25;
+    letter-spacing: -.1rem;
+    margin-bottom: 1.8rem;
+    margin-top: 1.8rem;
+}
+
+h3 {
+    font-size: 3.0rem;
+    line-height: 1.3;
+    letter-spacing: -.1rem;
+    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+h4 {
+    font-family: "Playfair Display", sans-serif;
+    font-size: 4rem;
+    line-height: 1.35;
+    letter-spacing: -.08rem;
+    margin-bottom: 1.2rem;
+    margin-top: 1.2rem;
+}
+
+h5 {
+    font-size: 2.2rem;
+    line-height: 1.5;
+    letter-spacing: -.05rem;
+    margin-bottom: 0.6rem;
+    margin-top: 0.6rem;
+}
+
+h6 {
+    font-size: 2.0rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    margin-bottom: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+p {
+    margin-top: 0;
+}
+
+
+/* Slider colours
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.rc-slider-dot-active, .rc-slider-handle {
+    border-color: #2cfec1 !important;
+}
+.rc-slider-track {
+    background-color: #2cfec1 !important
+}
+.rc-slider-rail {
+    background-color: #1d2731 !important
+}
+
+/*List styling */
+ul {
+    list-style: circle inside;
+    font-size: medium;
+}
