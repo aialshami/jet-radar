@@ -6,18 +6,12 @@ from dash.dependencies import Input, Output, State
 from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_average, number_of_flights_over_time, create_flight_map
 from db_connections import get_data_as_dataframe, SQLconnection
 from conversion_metrics import get_age_from_birthdate, get_gender_from_id, get_net_worth_as_million_dollars, get_most_recent_flight_info
-
+from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
 load_dotenv()
 TEMP_FLIGHT = {'Location': ['Start', 'End'], 'lat': [30, 40], 'long': [-90, -80]}
 
 
-# Unicode chars
-UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9", 
-           "tree": "\U0001F333", "sun": "\U0001F324", "football": "\U000026BD",
-           "watch":"\U000023F1", "music":"\U0001F3B5", "phone": "\U0001F4F1",
-           "money":"\U0001F4B0", "film":"\U0001F3A5", "sweets":"\U0001F36C", 
-           "shopping": "\U0001F6D2", "tea":"\U00002615", "beer": "\U0001F37A"}
 
 app = Dash(__name__, use_pages=False)
 app.title = "MuskJet 2.0"
@@ -34,8 +28,8 @@ flight_df = get_data_as_dataframe(sql_conn, "flight")
 gender_df = get_data_as_dataframe(sql_conn, "gender")
 
 # Derive display values for celeb
-owner = owner_df[owner_df["name"] == "Floyd Mayweather"]
-name, age = 'Floyd Mayweather', get_age_from_birthdate(owner["birthdate"].values[0])
+owner = owner_df[owner_df["name"] == "Elon Musk"]
+name, age = 'Elon Musk', get_age_from_birthdate(owner["birthdate"].values[0])
 print(name, age)
 gender = get_gender_from_id(owner["gender_id"].values[0], gender_df)
 worth = get_net_worth_as_million_dollars(owner['est_net_worth'].values[0])
@@ -79,7 +73,11 @@ app.layout = html.Div(
                          children=[
                              html.H4(id="title", children="Visualisation of private jet emissions & costs"),
                              html.P(id="description", children="It's hard to understand how bad these planes are - this helps."),
-                             
+                             dcc.Dropdown(
+                                        options=CELEB_DROPDOWN_OPTIONS,
+                                        value="elon_musk",
+                                        id="celeb-dropdown",
+                                    ),
                              html.Div(id="flight-info-box", className="container", children=[
                                         html.Div(id="cost-div", className="box", children=f"This flight cost: ${1}"),
                                         html.Div(id="co2-div", className="box", children=f"This flight produced {1} mtCO2"),
@@ -128,6 +126,6 @@ app.layout = html.Div(
 
 if __name__ == "__main__":
     app.run_server(debug=True, host="0.0.0.0", port=8080, use_reloader=True)
-    print(owner.head())
+
 
     
