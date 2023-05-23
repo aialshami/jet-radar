@@ -36,10 +36,12 @@ def get_net_worth_as_million_dollars(worth: int) -> str:
     """ Returns net worth as N millions (i.e 180 *10^6 -> 180M) """
     return f"${round(worth/10**6)}M"
 
+
 def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:DataFrame) -> dict:
     """ For a given person return the useful data of the most recent flight they've completed.
         In progress flights will not appear until the next running of prod. Lambda
     """
+    
     output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
                    "start":None, "end": None, "time_taken": None}
 
@@ -50,5 +52,3 @@ def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:Da
     if not sorted_flights.empty:
         most_recent = sorted_flights[0]
         output_dict["flight_id"] = most_recent[""]
-
-    
