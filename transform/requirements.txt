@@ -1,0 +1,5 @@
+python-dotenv
+s3fs
+country_converter
+psycopg2-binary
+pandas
