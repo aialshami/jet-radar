@@ -1,3 +1,4 @@
+"""Tests for transform module and it's utility functions."""
 from datetime import datetime, timedelta
 from psycopg2.extensions import connection
 from transform import *
