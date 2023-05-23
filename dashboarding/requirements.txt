@@ -1,0 +1,14 @@
+sqlalchemy
+numpy
+pandas
+psycopg2-binary
+pyarrow
+python-dotenv
+dash
+matplotlib
+plotly
+seaborn
+dash_bootstrap_components
+plotly.express
+cufflinks
+requests

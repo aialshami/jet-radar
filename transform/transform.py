@@ -84,6 +84,7 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
                         (jet, flight_no))
 
 
+
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     """Inserts airport data into production db and populates country/ continent tables.
     Expects the production db connection object and the airport data."""
@@ -94,6 +95,7 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         return
 
     country_converter = coco.CountryConverter()
+
 
     continent_codes = {"Asia": "AS", "Europe": "EU", "Africa": "AF", "Oceania": "OC", "America": "AM"}
 
@@ -106,6 +108,7 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         country = airport_info[airport]["iso"]
         country_name = country_converter.convert(names=country, to="name_short")
         continent_name = country_converter.convert(names=country, to="continent")
+
         if country_name == "not found" or continent_name == "not found":
             continue
         continent = continent_codes[continent_name]
@@ -289,8 +292,6 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
     curs.close()
 
 
-
-
 def handler(event = None, context = None) -> None:
     """AWS lambda handler function that loads in json data, reads from the staging db and
     inserts flights, airports and owners into production db."""
@@ -313,3 +314,4 @@ def handler(event = None, context = None) -> None:
 
     production_conn.close()
     staging_conn.close()
+
