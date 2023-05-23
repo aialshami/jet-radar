@@ -45,7 +45,7 @@ print(gender, worth)
 fuel_used, co2_used = "no full flight found", "no full flight found"
 flight_cost, flight_time = "no full flight found", "no full flight found"
 
-most_recent_flight = get_most_recent_flight_info(owner, flight_df, aircraft_df, )
+most_recent_flight = get_most_recent_flight_info(owner, flight_df, aircraft_df)
 if most_recent_flight is not None:
     fuel_used = most_recent_flight['fuel_used']
 
