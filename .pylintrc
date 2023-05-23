@@ -3,7 +3,8 @@
 disable =
     unused-import,
     unused-argument,
-    import-error
+    import-error,
+    too-many-locals
 
 
 [pylint.messages_control]
@@ -11,7 +12,8 @@ disable =
 disable = 
     unused-import,
     unused-argument,
-    import-error
+    import-error,
+    too-many-locals
 
 
 [pylint.format]
