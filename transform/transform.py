@@ -42,66 +42,47 @@ def load_json_file_from_s3(file_name: str, bucket_name: str = config["S3_BUCKET_
     """Reads a json file from an s3 bucket and returns the object. Requires the names of the bucket
     and file as strings."""
 
-    s3 = S3FileSystem(key=config["ACCESS_KEY"],
+    s3_session = S3FileSystem(key=config["ACCESS_KEY"],
                       secret=config["SECRET_KEY"])
 
-    return json.load(s3.open(path=f"{bucket_name}/{file_name}"))
+    return json.load(s3_session.open(path=f"{bucket_name}/{file_name}"))
 
 
 def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
     """Parses events from staging db and extracts flight number, tail number, departure time/location
     and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
-    df = pd.read_sql("SELECT * FROM tracked_event;", conn)
-    #curs = conn.cursor(cursor_factory=RealDictCursor)
+    tracked_event_df = pd.read_sql("SELECT * FROM tracked_event;", conn)
+    curs = conn.cursor(cursor_factory=RealDictCursor)
 
-    jets = df["aircraft_reg"].unique()
+    jets = tracked_event_df["aircraft_reg"].unique()
     for jet in jets:
-        flight = df[df["aircraft_reg"] == jet].sort_values("time_input").reset_index().to_dict('records')
+        flights = tracked_event_df[tracked_event_df["aircraft_reg"] == jet].reset_index()
 
-        emergency = flight[-1]["emergency"]
+        flight_numbers = flights["flight_no"].unique()
+        for flight_no in flight_numbers:
+            flight = flights[flights["flight_no"] == flight_no].sort_values("time_input").reset_index().to_dict("records")
 
-        flight_no = flight[0]["flight_no"]
-        if flight_no:
-            flight_no = flight_no.strip()
-
-        num_of_events = len(flight)
-        if num_of_events == 1:
-            continue
-
-        first_event = flight[0]
-        dep_time = first_event["time_input"]
-        dep_location = (first_event["lat"], first_event["lon"])
-
-        for i in range(1, num_of_events):
-            current_event = flight[i]
-            previous_event = flight[i-1]
-            event_gap = (current_event["time_input"] - previous_event["time_input"]).total_seconds()
-
-            if event_gap < 60*60 and i != num_of_events-1:
+            if not flight:
                 continue
 
-            if i == num_of_events-1:
-                arr_time = current_event["time_input"]
-                arr_location = (current_event["lat"], current_event["lon"])
+            dep_time = flight[0]["time_input"]
+            dep_location = (flight[0]["lat"], flight[0]["lon"])
 
-                seconds_since_last_event = (pd.Timestamp.now() - arr_time).total_seconds()
-                if seconds_since_last_event < 30*60:
-                    break
+            arr_time = flight[-1]["time_input"]
 
-                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                #curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
-                             #(jet, arr_time))
-            else:
-                arr_time = previous_event["time_input"]
-                arr_location = (previous_event["lat"], previous_event["lon"])
+            # if last event was within half an hour, the jet may still be in the air.
+            if (pd.Timestamp.now() - arr_time).total_seconds() < 30*60:
+                continue
 
-                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                #curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
-                             #(jet, arr_time))
+            arr_location = (flight[-1]["lat"], flight[-1]["lon"])
 
-                dep_time = current_event["time_input"]
-                dep_location = (current_event["lat"], current_event["lon"])
+            emergency = flight[-1]["emergency"]
+
+            yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
+            curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND flight_no = %s",
+                        (jet, flight_no))
+
 
 
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
@@ -113,7 +94,8 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     if curs.fetchall():
         return
 
-    cc = coco.CountryConverter()
+    country_converter = coco.CountryConverter()
+
 
     continent_codes = {"Asia": "AS", "Europe": "EU", "Africa": "AF", "Oceania": "OC", "America": "AM"}
 
@@ -124,8 +106,9 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         lon = airport_info[airport]["lon"]
 
         country = airport_info[airport]["iso"]
-        country_name = cc.convert(names=country, to="name_short")
-        continent_name = cc.convert(names=country, to="continent")
+        country_name = country_converter.convert(names=country, to="name_short")
+        continent_name = country_converter.convert(names=country, to="continent")
+
         if country_name == "not found" or continent_name == "not found":
             continue
         continent = continent_codes[continent_name]
@@ -169,7 +152,7 @@ def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
 
         curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
                     (owner_id, job_role_id))
-        
+
 
 def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict[dict]) -> int | None:
     """Returns the id of the aircraft model if it exists in the dataset. Otherwise returns none."""
@@ -184,7 +167,7 @@ def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict
     model_id = curs.fetchall()
     if model_id:
         return model_id[0]["model_id"]
-    
+
     curs.execute("INSERT INTO model (code, name, fuel_efficiency) VALUES (%s, %s, %s) RETURNING model_id",
                 (aircraft_model, aircraft_model_name, fuel_efficiency))
     return curs.fetchall()[0]["model_id"]
@@ -208,12 +191,12 @@ def get_aircraft_owner_id(curs: cursor, name: str, gender_id: int, est_net_worth
 
 def get_gender_id(curs: cursor, gender: str) -> int | None:
     """Returns appropriate gender id from db if it exists, otherwise inserts the gender and
-    returns the new gender id. Expects a cursor object connected to the production db and the gender
-    as a string. Gender id is an integer."""
+    returns the new gender id. Expects a cursor object connected to the production db and the 
+    gender as a string. Gender id is an integer."""
 
     if not gender:
         return None
-    
+
     curs.execute("SELECT gender_id FROM gender WHERE name = %s", (gender,))
     gender_id = curs.fetchall()
     if gender_id:
@@ -309,9 +292,9 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
     curs.close()
 
 
-
-
-def handler(event, context) -> None:
+def handler(event = None, context = None) -> None:
+    """AWS lambda handler function that loads in json data, reads from the staging db and
+    inserts flights, airports and owners into production db."""
 
     airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON))
     aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)
@@ -332,8 +315,3 @@ def handler(event, context) -> None:
     production_conn.close()
     staging_conn.close()
 
-
-
-
-if __name__ == "__main__":
-    pass
