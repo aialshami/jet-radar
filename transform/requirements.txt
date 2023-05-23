@@ -1,5 +1,5 @@
 python-dotenv
 s3fs
-country_converter
+country-converter
 psycopg2-binary
 pandas
