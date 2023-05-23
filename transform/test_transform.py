@@ -5,7 +5,6 @@ from transform import *
 from utilities import haversine_distance, find_nearest_airport, calculate_fuel_consumption
 
 
-
 def test_antipodal_haversine_distance_is_half_circumference_of_earth():
     """Check that Haversine distance between the poles is equal to half the
     circumference of the earth."""
@@ -31,6 +30,7 @@ def test_find_nearest_airport_BER(airport_data):
 def test_find_nearest_airport_WKK(airport_data):
     """Checks that when the lat/lon of WKK is input to the find_nearest_airport
     function, WKK is returned."""
+
     assert find_nearest_airport(59.3, -158.61, airport_data) == "WKK"
 
 
@@ -61,6 +61,7 @@ def test_production_db_connection(production_db_connection):
 def test_load_airport_data_from_s3(airport_data):
     """Checks that the airport data is successfully retrieved from S3."""
     assert isinstance(airport_data, dict) and "iata" in list(airport_data.values())[0]
+
 
 def test_load_aircraft_data_from_s3(aircraft_data):
     """Checks that the aircraft data is successfully retrieved from S3."""

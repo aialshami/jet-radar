@@ -106,6 +106,7 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         country = airport_info[airport]["iso"]
         country_name = country_converter.convert(names=country, to="name_short")
         continent_name = country_converter.convert(names=country, to="continent")
+
         if country_name == "not found" or continent_name == "not found":
             continue
         continent = continent_codes[continent_name]
@@ -294,7 +295,6 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
 def handler(event = None, context = None) -> None:
     """AWS lambda handler function that loads in json data, reads from the staging db and
     inserts flights, airports and owners into production db."""
-
     airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON))
     aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)
     jet_owners_data = load_json_file_from_s3(JET_OWNERS_JSON)
@@ -313,3 +313,4 @@ def handler(event = None, context = None) -> None:
 
     production_conn.close()
     staging_conn.close()
+
