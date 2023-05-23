@@ -41,10 +41,10 @@ def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:Da
     """ For a given person return the useful data of the most recent flight they've completed.
         In progress flights will not appear until the next running of prod. Lambda
     """
-    
+
     output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
                    "start":None, "end": None, "time_taken": None}
-
+    
     combined_df = pd.merge(flights, aircraft, on='tail_number')
     owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
     sorted_flights = owners_flights.sort_values(by='arr_time', ascending=False)
