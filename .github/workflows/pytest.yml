@@ -13,6 +13,7 @@ jobs:
   pytest:
     name: test code before pushing to GitHub
     runs-on: ubuntu-latest
+    environment: jet_env
 
     steps:
       - uses: actions/checkout@v3
