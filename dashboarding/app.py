@@ -67,7 +67,6 @@ app.layout = html.Div(
                             html.Div(id="flights-tracked-container", className="container", children=[
                                 html.P(id="num-flights-tracked",className="box", children="# of flights tracked is: 5"),
                             ]),
-                             
                         ]),
                 html.Div(id="center-column",
                          children=[
