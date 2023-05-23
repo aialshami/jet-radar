@@ -53,55 +53,35 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
     and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
     df = pd.read_sql("SELECT * FROM tracked_event;", conn)
-    #curs = conn.cursor(cursor_factory=RealDictCursor)
+    curs = conn.cursor(cursor_factory=RealDictCursor)
 
     jets = df["aircraft_reg"].unique()
     for jet in jets:
-        flight = df[df["aircraft_reg"] == jet].sort_values("time_input").reset_index().to_dict('records')
+        flights = df[df["aircraft_reg"] == jet].reset_index()
 
-        emergency = flight[-1]["emergency"]
+        flight_numbers = flights["flight_no"].unique()
+        for flight_no in flight_numbers:
+            flight = flights[flights["flight_no"] == flight_no].sort_values("time_input").reset_index().to_dict("records")
 
-        flight_no = flight[0]["flight_no"]
-        if flight_no:
-            flight_no = flight_no.strip()
-
-        num_of_events = len(flight)
-        if num_of_events == 1:
-            continue
-
-        first_event = flight[0]
-        dep_time = first_event["time_input"]
-        dep_location = (first_event["lat"], first_event["lon"])
-
-        for i in range(1, num_of_events):
-            current_event = flight[i]
-            previous_event = flight[i-1]
-            event_gap = (current_event["time_input"] - previous_event["time_input"]).total_seconds()
-
-            if event_gap < 60*60 and i != num_of_events-1:
+            if not flight:
                 continue
 
-            if i == num_of_events-1:
-                arr_time = current_event["time_input"]
-                arr_location = (current_event["lat"], current_event["lon"])
+            dep_time = flight[0]["time_input"]
+            dep_location = (flight[0]["lat"], flight[0]["lon"])
 
-                seconds_since_last_event = (pd.Timestamp.now() - arr_time).total_seconds()
-                if seconds_since_last_event < 30*60:
-                    break
+            arr_time = flight[-1]["time_input"]
 
-                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                #curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
-                             #(jet, arr_time))
-            else:
-                arr_time = previous_event["time_input"]
-                arr_location = (previous_event["lat"], previous_event["lon"])
+            # if last event was within half an hour, the jet may still be in the air.
+            if (pd.Timestamp.now() - arr_time).total_seconds() < 30*60:
+                continue
 
-                yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
-                #curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
-                             #(jet, arr_time))
+            arr_location = (flight[-1]["lat"], flight[-1]["lon"])
 
-                dep_time = current_event["time_input"]
-                dep_location = (current_event["lat"], current_event["lon"])
+            emergency = flight[-1]["emergency"]
+
+            yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
+            curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND time_input <= %s",
+                        (jet, arr_time))
 
 
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
@@ -311,7 +291,7 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
 
 
 
-def handler(event, context) -> None:
+def handler(event = None, context = None) -> None:
 
     airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON))
     aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)
