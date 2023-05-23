@@ -42,22 +42,22 @@ def load_json_file_from_s3(file_name: str, bucket_name: str = config["S3_BUCKET_
     """Reads a json file from an s3 bucket and returns the object. Requires the names of the bucket
     and file as strings."""
 
-    s3 = S3FileSystem(key=config["ACCESS_KEY"],
+    s3_session = S3FileSystem(key=config["ACCESS_KEY"],
                       secret=config["SECRET_KEY"])
 
-    return json.load(s3.open(path=f"{bucket_name}/{file_name}"))
+    return json.load(s3_session.open(path=f"{bucket_name}/{file_name}"))
 
 
 def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
     """Parses events from staging db and extracts flight number, tail number, departure time/location
     and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
-    df = pd.read_sql("SELECT * FROM tracked_event;", conn)
+    tracked_event_df = pd.read_sql("SELECT * FROM tracked_event;", conn)
     curs = conn.cursor(cursor_factory=RealDictCursor)
 
-    jets = df["aircraft_reg"].unique()
+    jets = tracked_event_df["aircraft_reg"].unique()
     for jet in jets:
-        flights = df[df["aircraft_reg"] == jet].reset_index()
+        flights = tracked_event_df[tracked_event_df["aircraft_reg"] == jet].reset_index()
 
         flight_numbers = flights["flight_no"].unique()
         for flight_no in flight_numbers:
@@ -93,7 +93,7 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     if curs.fetchall():
         return
 
-    cc = coco.CountryConverter()
+    country_converter = coco.CountryConverter()
 
     continent_codes = {"Asia": "AS", "Europe": "EU", "Africa": "AF", "Oceania": "OC", "America": "AM"}
 
@@ -104,8 +104,8 @@ def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
         lon = airport_info[airport]["lon"]
 
         country = airport_info[airport]["iso"]
-        country_name = cc.convert(names=country, to="name_short")
-        continent_name = cc.convert(names=country, to="continent")
+        country_name = country_converter.convert(names=country, to="name_short")
+        continent_name = country_converter.convert(names=country, to="continent")
         if country_name == "not found" or continent_name == "not found":
             continue
         continent = continent_codes[continent_name]
@@ -149,7 +149,7 @@ def insert_job_roles(curs: cursor, job_roles: list, owner_id: int) -> None:
 
         curs.execute("INSERT INTO owner_role_link (owner_id, job_role_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
                     (owner_id, job_role_id))
-        
+
 
 def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict[dict]) -> int | None:
     """Returns the id of the aircraft model if it exists in the dataset. Otherwise returns none."""
@@ -164,7 +164,7 @@ def get_aircraft_model_id(curs: cursor, aircraft_model: str, aircraft_info: dict
     model_id = curs.fetchall()
     if model_id:
         return model_id[0]["model_id"]
-    
+
     curs.execute("INSERT INTO model (code, name, fuel_efficiency) VALUES (%s, %s, %s) RETURNING model_id",
                 (aircraft_model, aircraft_model_name, fuel_efficiency))
     return curs.fetchall()[0]["model_id"]
@@ -188,12 +188,12 @@ def get_aircraft_owner_id(curs: cursor, name: str, gender_id: int, est_net_worth
 
 def get_gender_id(curs: cursor, gender: str) -> int | None:
     """Returns appropriate gender id from db if it exists, otherwise inserts the gender and
-    returns the new gender id. Expects a cursor object connected to the production db and the gender
-    as a string. Gender id is an integer."""
+    returns the new gender id. Expects a cursor object connected to the production db and the 
+    gender as a string. Gender id is an integer."""
 
     if not gender:
         return None
-    
+
     curs.execute("SELECT gender_id FROM gender WHERE name = %s", (gender,))
     gender_id = curs.fetchall()
     if gender_id:
@@ -292,6 +292,8 @@ def insert_todays_flights(prod_conn: connection, stage_conn: connection,
 
 
 def handler(event = None, context = None) -> None:
+    """AWS lambda handler function that loads in json data, reads from the staging db and
+    inserts flights, airports and owners into production db."""
 
     airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON))
     aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)
