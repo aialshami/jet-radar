@@ -319,3 +319,7 @@ def handler(event = None, context = None) -> None:
     production_conn.close()
     staging_conn.close()
 
+
+
+if __name__ == "__main__":
+    pass
