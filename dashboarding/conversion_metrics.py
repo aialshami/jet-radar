@@ -98,26 +98,12 @@ def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_
     flight_merge_df = pd.merge(flight_df, owner_aircraft_df, on="tail_number")
     combined_df = pd.merge(flight_merge_df, airport, left_on= "dep_airport_id", right_on="airport_id", suffixes=("_owner","_dep_airport"))
     combined_df = pd.merge(combined_df, airport, left_on= "arr_airport_id", right_on="airport_id", suffixes=("_dep_airport","_arr_airport"))
-    combined_df.to_csv("visual.csv")
 
-    fuel_data = []
-    airport_data = []
-    print(combined_df.tail(5))
-    for record in combined_df.tail(5):
-        fuel_data.append({
-            "fuel_usage": record["fuel_usage"],
-            "flight_cost": record["fuel_usage"]*AVG_FUEL_COST,
-            "flight_co2": record["fuel_usage"]*CO2_PER_GALLON
-        })
-        airport_data.append({
-            "lat_dep_airport": record["lat_dep_airport"],
-            "lon_dep_airport": record["lon_dep_airport"],
-            "lat_arr_airport": record["lat_arr_airport"],
-            "lon_arr_airport": record["lon_arr_airport"]
-        })
-    
+    fuel_df = combined_df.filter([
+        "fuel_usage","lat_dep_airport","lon_dep_airport",
+        "lat_arr_airport","lon_arr_airport"]).head(5)
 
-    return combined_df
+    return fuel_df.to_dict()
     # output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
     #                "start":None, "end": None, "time_taken": None}
 

@@ -39,8 +39,6 @@ worth = "180M ish"
 print(gender, worth)
 owner = owner_df[owner_df["name"] == "A-rod"]
 
-print(get_most_recent_flight_info(owner, flight_df, aircraft_df, airport_df))
-
 # HTML document
 app.layout = html.Div(
     id="root",
