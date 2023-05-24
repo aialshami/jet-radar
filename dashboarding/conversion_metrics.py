@@ -128,6 +128,7 @@ def get_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataFrame, 
 
 def get_new_infographic_text(previous: str):
     """ Changes the infographic text to the next visualisation emoji prompt """
+
     return f"previous was {previous} & next is CO2"
 
 
