@@ -1,7 +1,5 @@
 ![jet banner](https://aircharterservice-globalcontent-live.cphostaccess.com/images/blog-images/private_jet_in_the_sun_banner_tcm36-53924.jpg)
 
-<a name="readme-top"></a>
-
 # MUSK-JET ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️
 
 <!-- TABLE OF CONTENTS -->
@@ -55,14 +53,39 @@ At MUSK-JET, our purpose is to raise awareness about the carbon emissions genera
 
 ### Features
 
-Real-time data collection from the ADS-B Exchange API.
-Storage of collected data in a database for historical analysis.
-Interactive visualizations powered by Dash to explore aircraft movements and emission statistics.
-Customizable filters and search options to narrow down specific private aircraft owners.
-Integration with AWS services for a scalable and reliable architecture.
+- Real-time data collection from the ADS-B Exchange API.
+- Storage of collected data in a database for historical analysis.
+- Interactive visualizations powered by Dash to explore aircraft movements and emission statistics.
+- Customizable filters and search options to narrow down specific private aircraft owners.
+- Integration with AWS services for a scalable and reliable architecture.
 
 ## Getting Started
 
+To view our live Dashboard please click on image below:
+
+[![airplane door](https://twistedsifter.com/wp-content/uploads/2022/01/Screen-Shot-2022-01-06-at-8.33.44-AM.png?w=1024)](https://www.youtube.com/watch?v=xvFZjo5PgG0)
+
 ### Prerequisites
 
+Before you begin, ensure that you have the following prerequisites installed:
+
+- Python (version 3.6 or above) <a href="https://www.python.org/downloads/"><img src="https://www.python.org/static/community_logos/python-logo-generic.svg" height="20" alt="Python Logo"></a>
+- Pip (a package installer for Python)
+
 ### Installation
+
+To install and set up MUSK-JET, follow these steps:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/aialshami/musk-jet.git
+   ```
+
+   ```bash
+   cd musk-jet
+   ```
+
+   ```bash
+
+   ```
