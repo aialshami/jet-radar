@@ -1,7 +1,12 @@
 import pytest
+import os
+from dotenv import load_dotenv
 from transform import load_json_file_from_s3, AIRPORTS_JSON, AIRCRAFTS_JSON, get_db_connection, STAGING_SCHEMA, \
 PRODUCTION_SCHEMA
 from utilities import clean_airport_data
+
+
+load_dotenv()
 
 
 @pytest.fixture

@@ -1,9 +1,12 @@
 from pandas import DataFrame
 import pandas as pd
+import os
 from datetime import datetime
 from math import floor
 import numpy as np
 from numpy import random
+from db_connections import get_data_as_dataframe, SQLconnection
+
 
 
 CELEB_DROPDOWN_OPTIONS=[{"label": "Elon Musk", "value": "elon_musk",}, {"label": "Tom Cruise", "value": "tom_cruise",},
@@ -22,6 +25,7 @@ UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9",
            "money":"\U0001F4B0", "film":"\U0001F3A5", "sweets":"\U0001F36C", 
            "shopping": "\U0001F6D2", "tea":"\U00002615", "beer": "\U0001F37A"}
 
+
 co2_per_gallon_fuel = 0.01 #mtCO2 i.e metric tons of co2
 AVG_CO2_COMMUTE = 0.00496 #mtCo2 src: https://www.climatepartner.com/en/news/how-sustainable-commuting-can-improve-a-company-carbon-footprint#:~:text=Due%20to%20its%20significant%20impact,per%20commuting%20employee%20per%20day.
 
@@ -39,7 +43,8 @@ def infographic_co2(metric_ton_co2: float) -> str:
         raise ValueError("Something went seriously wrong with the random")
 
 
-def get_age_from_birthdate(birthdate: str) -> int:
+
+def get_age_from_birthdate(birthdate: np.datetime64) -> int:
     """ Converts stored birthdate to numerical age (initially yyyy-mm-dd)"""
     if isinstance(birthdate, str) and '-' in birthdate:
         separated_by_dash = birthdate.split('-')
@@ -58,6 +63,16 @@ def get_age_from_birthdate(birthdate: str) -> int:
         raise ValueError("Birthdate not in the correct format")
 
 
+def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[str]:
+    """Return the name/gender/age/worth with prefix attached """
+    owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
+    
+    gender = gender_df[gender_df["gender_id"] == owner_record['gender_id'].values[0]].values[0][1] # This pulls gender text
+    age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
+    worth = str(owner_record["est_net_worth"].values[0]/10**6) + "M"
+
+    return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
+    
 def get_gender_from_id(gender_id:float, gender_df: DataFrame) -> str:
     """ Maps gender_id to gender """
     gender_row = gender_df[gender_df["gender_id"] == gender_id]
@@ -93,3 +108,4 @@ def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_
     # if not sorted_flights.empty:
     #     most_recent = sorted_flights[0]
     #     output_dict["flight_id"] = most_recent[""]
+
