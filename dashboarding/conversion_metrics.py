@@ -77,3 +77,29 @@ def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[s
 
     return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
     
+def get_gender_from_id(gender_id:float, gender_df: DataFrame) -> str:
+    """ Maps gender_id to gender """
+    gender_row = gender_df[gender_df["gender_id"] == gender_id]
+    return gender_row["name"].values[0]
+
+def get_net_worth_as_million_dollars(worth: int) -> str:
+    """ Returns net worth as N millions (i.e 180 *10^6 -> 180M) """
+    return f"${round(worth/10**6)}M"
+
+
+def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:DataFrame) -> dict:
+    """ For a given person return the useful data of the most recent flight they've completed.
+        In progress flights will not appear until the next running of prod. Lambda
+    """
+    
+    output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
+                   "start":None, "end": None, "time_taken": None}
+
+    combined_df = pd.merge(flights, aircraft, on='tail_number')
+    owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
+    sorted_flights = owners_flights.sort_values(by='arr_time', ascending=False)
+
+    if not sorted_flights.empty:
+        most_recent = sorted_flights[0]
+        output_dict["flight_id"] = most_recent[""]
+

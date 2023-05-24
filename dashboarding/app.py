@@ -34,7 +34,6 @@ owner = owner_df[owner_df["name"] == "Elon Musk"]
 name, age = 'Elon Musk', 51
 gender, worth = "Male", "180M ish"
 
-
 # HTML document
 app.layout = html.Div(
     id="root",
