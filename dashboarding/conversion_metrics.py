@@ -99,9 +99,10 @@ def get_flight_co2(gallons:float) -> float:
 
 def get_flight_time(departure, arrival) -> str:
     """ Get the flight time from the flight data """
-    num_hrs = round((arrival.to_pydatetime() - departure.to_pydatetime()).seconds/(3600), 0)
-    num_mins = round((arrival.to_pydatetime() - departure.to_pydatetime()).seconds/(60), 0) - num_hrs*60
-    return f"{num_hrs} hrs and {num_mins} mins"
+    num_hrs = floor((arrival.to_pydatetime() - departure.to_pydatetime()).seconds/(3600))
+    num_mins = int((arrival.to_pydatetime() - departure.to_pydatetime()).seconds/(60)) - num_hrs*60
+    
+    return f"{num_hrs} hrs, {num_mins} mins"
 
 def get_total_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataFrame, flight_df:DataFrame) -> str:
     """ Gets the total number of flights we've tracked for celeb w/ given name """
