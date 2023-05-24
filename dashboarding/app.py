@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from dash.dependencies import Input, Output, State
 from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_average, number_of_flights_over_time, create_flight_map
 from db_connections import get_data_as_dataframe, SQLconnection
-from conversion_metrics import get_age_from_birthdate, get_gender_from_id, get_net_worth_as_million_dollars, get_most_recent_flight_info
+from conversion_metrics import get_age_from_birthdate
+from conversion_metrics import get_celeb_info, get_number_of_flights
 from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
 load_dotenv()
@@ -29,23 +30,8 @@ gender_df = get_data_as_dataframe(sql_conn, "gender")
 
 # Derive display values for celeb
 owner = owner_df[owner_df["name"] == "Elon Musk"]
-name, age = 'Elon Musk', get_age_from_birthdate(owner["birthdate"].values[0])
-print(name, age)
-gender = get_gender_from_id(owner["gender_id"].values[0], gender_df)
-worth = get_net_worth_as_million_dollars(owner['est_net_worth'].values[0])
-print(gender, worth)
-
-# Derive display values for the flight
-fuel_used, co2_used = "no full flight found", "no full flight found"
-flight_cost, flight_time = "no full flight found", "no full flight found"
-
-most_recent_flight = get_most_recent_flight_info(owner, flight_df, aircraft_df)
-if most_recent_flight is not None:
-    fuel_used = most_recent_flight['fuel_used']
-
-
-
-
+name, age = 'Elon Musk', 51
+gender, worth = "Male", "180M ish"
 
 # HTML document
 app.layout = html.Div(
@@ -65,7 +51,7 @@ app.layout = html.Div(
                                     html.Li(id='celeb-info-text-worth', children=f"Worth: {worth}")]),
                                  ]),
                             html.Div(id="flights-tracked-container", className="container", children=[
-                                html.P(id="num-flights-tracked",className="box", children="# of flights tracked is: 5"),
+                                html.P(id="num-flights-tracked",className="box", children="# of flights tracked is: "),
                             ]),
                         ]),
                 html.Div(id="center-column",
@@ -76,6 +62,9 @@ app.layout = html.Div(
                                         options=CELEB_DROPDOWN_OPTIONS,
                                         value="elon_musk",
                                         id="celeb-dropdown",
+
+                                        clearable=False
+
                                     ),
                              html.Div(id="flight-info-box", className="container", children=[
                                         html.Div(id="cost-div", className="box", children=f"This flight cost: ${1}"),
@@ -121,6 +110,28 @@ app.layout = html.Div(
                                  ])
                          ]),
 ])])
+
+
+@app.callback(
+    [Output("celeb-info-text-name", "children"),
+     Output("celeb-info-text-gender", "children"),
+     Output("celeb-info-text-age", "children"),
+     Output("celeb-info-text-worth", "children"),
+     Output("celeb-img", "src"),
+     Output("num-flights-tracked", "children"),
+
+    ],
+    Input("celeb-dropdown", "value"),
+)
+def swap_celebrity(dropdown_value:str):
+    """ This is a callback for the dropdown list to pipe data into all the elements """
+    celeb_name = " ".join([x[0].upper() + x[1:] for x in dropdown_value.split('_')])
+    name, gender, age, worth = get_celeb_info(celeb_name, owner_df, gender_df)
+    celeb_img = f"assets/celeb_photos/{dropdown_value}.jpg"
+    number_of_flights_tracked = get_number_of_flights(celeb_name, owner_df, aircraft_df, flight_df)
+    
+    return name, gender, age, worth, celeb_img, number_of_flights_tracked
+
 
 
 if __name__ == "__main__":
