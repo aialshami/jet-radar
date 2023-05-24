@@ -63,21 +63,8 @@ def get_age_from_birthdate(birthdate: np.datetime64) -> int:
         raise ValueError("Birthdate not in the correct format")
 
 
-def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[str]:
-    """Return the name/gender/age/worth with prefix attached """
-    if name == "Jay Z":
-        name = name.replace(" ", "-")
-    elif name.lower() =="a rod":
-        name = "A-rod"
 
-    owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
-    gender = gender_df[gender_df["gender_id"] == owner_record['gender_id'].values[0]].values[0][1] # This pulls gender text
-    age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
-    worth = str(round(owner_record["est_net_worth"].values[0]/10**6)) + "M"
-
-    return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
-    
-def get_gender_from_id(gender_id:float, gender_df: DataFrame) -> str:
+def get_gender_from_id(gender_id:int, gender_df: DataFrame) -> str:
     """ Maps gender_id to gender """
     gender_row = gender_df[gender_df["gender_id"] == gender_id]
     return gender_row["name"].values[0]
@@ -102,4 +89,41 @@ def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:Da
     if not sorted_flights.empty:
         most_recent = sorted_flights[0]
         output_dict["flight_id"] = most_recent[""]
+
+
+
+def manage_names_with_dashes(name:str) -> str:
+    """ Converts names that should have dashes, plus A-rod """
+    if name.lower() == "jay z":
+        return name.replace(" ", "-")
+    elif name.lower() =="a rod":
+        return "A-rod"
+    else:
+        return name
+
+def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[str]:
+    """Return the name/gender/age/worth with prefix attached """
+    name = manage_names_with_dashes(name)
+
+    owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
+    gender_id = int(owner_record['gender_id'].values[0])
+    gender = get_gender_from_id(gender_id, gender_df)
+
+    age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
+    worth = str(round(owner_record["est_net_worth"].values[0]/10**6)) + "M"
+
+    return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
+
+
+def get_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataFrame, flight_df:DataFrame) -> str:
+    """ Gets the total number of flights we've tracked for celeb w/ given name """
+    name = manage_names_with_dashes(name)
+
+    owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
+    owner_aircraft = aircraft_df[aircraft_df["owner_id"] == owner_record["owner_id"].values[0]]
+    relevant_flights = flight_df[flight_df["tail_number"] == owner_aircraft["tail_number"].values[0]]
+    
+    return "# of flights tracked is: " + str(len(relevant_flights))
+
+
 
