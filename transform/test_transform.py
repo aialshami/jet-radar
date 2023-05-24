@@ -1,9 +1,12 @@
 """Tests for transform module and it's utility functions."""
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from psycopg2.extensions import connection
 from transform import *
 from utilities import haversine_distance, find_nearest_airport, calculate_fuel_consumption
 
+
+load_dotenv()
 
 
 def test_antipodal_haversine_distance_is_half_circumference_of_earth():
