@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from moto import mock_s3
 
-from extract import get_flights_for_all_celebs, get_flight_params, get_celeb_json
+from extract import get_flights_for_all_celebs, get_flight_params, get_celeb_json, get_current_flight_for_icao
 
 
 def test_celebs_have_expected_plane_info(celeb_planes_data):
@@ -46,19 +46,25 @@ def test_get_celeb_json_from_s3(mocked_s3):
     """"""
     os.environ["S3_BUCKET_NAME"] = "test_bucket"
     os.environ["CELEB_INFO"] = "test"
-    mock_bucket = mocked_s3.return_value.Object # When you make resource, and ask it for an object
+
+    mock_bucket = mocked_s3.return_value.Object
     mock_readable = MagicMock()
     mock_readable.read.return_value = '{"please": "work"}'
-    mock_bucket.return_value.get.return_value = {"Body": mock_readable} # When you get an object from a resource and ask it for a get
+    mock_bucket.return_value.get.return_value = {"Body": mock_readable}
     data = get_celeb_json()
 
+    mock_bucket.assert_called()
     assert data == {"please": "work"}
 
 
-"""@patch("boto3.resource")
-def test_get_celeb_json_from_s3(mocked_s3):
+@patch("requests.get")
+def test_api_call(mock_request):
     """"""
-    mocked_s3 = mock_s3()
+    os.environ["RAPIDAPI_KEY"] = "shhhh"
+    os.environ["RAPIDAPI_HOST"] = "it's secret"
 
-    assert data == {}"""
-    
+    mock_request.return_value.json.return_value = "Success"
+    data = get_current_flight_for_icao("6zerozerozero")
+
+    mock_request.assert_called()
+    assert data == "Success"
