@@ -1,9 +1,12 @@
 from pandas import DataFrame
 import pandas as pd
+import os
 from datetime import datetime
 from math import floor
 import numpy as np
 from numpy import random
+from db_connections import get_data_as_dataframe, SQLconnection
+
 
 
 CELEB_DROPDOWN_OPTIONS=[{"label": "Elon Musk", "value": "elon_musk",}, {"label": "Tom Cruise", "value": "tom_cruise",},
@@ -21,6 +24,7 @@ UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9",
            "watch":"\U000023F1", "music":"\U0001F3B5", "phone": "\U0001F4F1",
            "money":"\U0001F4B0", "film":"\U0001F3A5", "sweets":"\U0001F36C", 
            "shopping": "\U0001F6D2", "tea":"\U00002615", "beer": "\U0001F37A"}
+
 
 co2_per_gallon_fuel = 0.01 #mtCO2 i.e metric tons of co2
 AVG_CO2_COMMUTE = 0.00496 #mtCo2 src: https://www.climatepartner.com/en/news/how-sustainable-commuting-can-improve-a-company-carbon-footprint#:~:text=Due%20to%20its%20significant%20impact,per%20commuting%20employee%20per%20day.
@@ -40,7 +44,7 @@ def infographic_co2(metric_ton_co2: float) -> str:
 
 
 
-def get_age_from_birthdate(birthdate: str) -> int:
+def get_age_from_birthdate(birthdate: np.datetime64) -> int:
     """ Converts stored birthdate to numerical age (initially yyyy-mm-dd)"""
     if isinstance(birthdate, str) and '-' in birthdate:
         separated_by_dash = birthdate.split('-')
@@ -59,28 +63,13 @@ def get_age_from_birthdate(birthdate: str) -> int:
         raise ValueError("Birthdate not in the correct format")
 
 
-def get_gender_from_id(gender_id:float, gender_df: DataFrame) -> str:
-    """ Maps gender_id to gender """
-    gender_row = gender_df[gender_df["gender_id"] == gender_id]
-    return gender_row["name"].values[0]
+def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[str]:
+    """Return the name/gender/age/worth with prefix attached """
+    owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
+    
+    gender = gender_df[gender_df["gender_id"] == owner_record['gender_id'].values[0]].values[0][1] # This pulls gender text
+    age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
+    worth = str(owner_record["est_net_worth"].values[0]/10**6) + "M"
 
-def get_net_worth_as_million_dollars(worth: int) -> str:
-    """ Returns net worth as N millions (i.e 180 *10^6 -> 180M) """
-    return f"${round(worth/10**6)}M"
-
-def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:DataFrame) -> dict:
-    """ For a given person return the useful data of the most recent flight they've completed.
-        In progress flights will not appear until the next running of prod. Lambda
-    """
-    output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
-                   "start":None, "end": None, "time_taken": None}
-
-    combined_df = pd.merge(flights, aircraft, on='tail_number')
-    owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
-    sorted_flights = owners_flights.sort_values(by='arr_time', ascending=False)
-
-    if not sorted_flights.empty:
-        most_recent = sorted_flights[0]
-        output_dict["flight_id"] = most_recent[""]
-
+    return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
     
