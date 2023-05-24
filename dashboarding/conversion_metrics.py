@@ -32,6 +32,7 @@ def get_gender_from_id(gender_id:float, gender_df: DataFrame) -> str:
     gender_row = gender_df[gender_df["gender_id"] == gender_id]
     return gender_row["name"].values[0]
 
+
 def get_net_worth_as_million_dollars(worth: int) -> str:
     """ Returns net worth as N millions (i.e 180 *10^6 -> 180M) """
     return f"${round(worth/10**6)}M"
