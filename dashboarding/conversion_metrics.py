@@ -42,7 +42,7 @@ UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9",
            "money":"\U0001F4B0", "film":"\U0001F3A5", "sweets":"\U0001F36C", 
            "shopping": "\U0001F6D2", "tea":"\U00002615", "beer": "\U0001F37A"}
 
-co2_per_gallon_fuel = 0.01 #mtCO2 i.e metric tons of co2
+CO2_PER_GALLON = 0.01 #mtCO2 i.e metric tons of co2
 AVG_CO2_COMMUTE = 0.00496 #mtCo2 src: https://www.climatepartner.com/en/news/how-sustainable-commuting-can-improve-a-company-carbon-footprint#:~:text=Due%20to%20its%20significant%20impact,per%20commuting%20employee%20per%20day.
 AVG_FUEL_COST = 5.91 #https://www.airnav.com/fuel/report.html
 
@@ -92,22 +92,30 @@ def get_net_worth_as_million_dollars(worth: int) -> str:
 
 def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_df:DataFrame, airport) -> dict:
     """ For a given person return the useful data of the most recent flight they've completed.
-        In progress flights will not appear until the next running of prod. Lambda
+        In progress flights will not appear until the next running of prod. Lambda.
     """
-
     owner_aircraft_df = pd.merge(owner, aircraft_df, on="owner_id")
     flight_merge_df = pd.merge(flight_df, owner_aircraft_df, on="tail_number")
     combined_df = pd.merge(flight_merge_df, airport, left_on= "dep_airport_id", right_on="airport_id", suffixes=("_owner","_dep_airport"))
     combined_df = pd.merge(combined_df, airport, left_on= "arr_airport_id", right_on="airport_id", suffixes=("_dep_airport","_arr_airport"))
     combined_df.to_csv("visual.csv")
+
+    fuel_data = []
+    airport_data = []
+    print(combined_df.tail(5))
+    for record in combined_df.tail(5):
+        fuel_data.append({
+            "fuel_usage": record["fuel_usage"],
+            "flight_cost": record["fuel_usage"]*AVG_FUEL_COST,
+            "flight_co2": record["fuel_usage"]*CO2_PER_GALLON
+        })
+        airport_data.append({
+            "lat_dep_airport": record["lat_dep_airport"],
+            "lon_dep_airport": record["lon_dep_airport"],
+            "lat_arr_airport": record["lat_arr_airport"],
+            "lon_arr_airport": record["lon_arr_airport"]
+        })
     
-    latest_5 = combined_df["fuel_usage"].head(5)
-    
-    # output_dict = {
-    #     "fuel_usage": combined_df["fuel_usage"],
-    #     "flight_cost": combined_df["fuel_usage"]*AVG_FUEL_COST,
-    #     "flight_co2": 
-    # }
 
     return combined_df
     # output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
