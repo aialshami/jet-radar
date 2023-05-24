@@ -32,10 +32,7 @@ gender_df = get_data_as_dataframe(sql_conn, "gender")
 # Derive display values for celeb
 owner = owner_df[owner_df["name"] == "Elon Musk"]
 name, age = 'Elon Musk', 51
-print(name, age)
-gender = "Male"
-worth = "180M ish"
-print(gender, worth)
+gender, worth = "Male", "180M ish"
 
 # HTML document
 app.layout = html.Div(
@@ -118,6 +115,7 @@ app.layout = html.Div(
      Output("celeb-info-text-gender", "children"),
      Output("celeb-info-text-age", "children"),
      Output("celeb-info-text-worth", "children"),
+     Output("celeb-img", "src")
      
     ],
     Input("celeb-dropdown", "value"),
@@ -125,10 +123,10 @@ app.layout = html.Div(
 def swap_celebrity(dropdown_value:str)->None:
     """ This is a callback for the dropdown list to pipe data into all the elements """
     celeb_name = " ".join([x[0].upper() + x[1:] for x in dropdown_value.split('_')])
-    celeb_info = get_celeb_info(celeb_name, owner_df, gender_df)
+    name, gender, age, worth = get_celeb_info(celeb_name, owner_df, gender_df)
+    celeb_img = f"assets/celeb_photos/{dropdown_value}.jpg"
     
-    
-    return celeb_info
+    return name, gender, age, worth, celeb_img
 
     
 
