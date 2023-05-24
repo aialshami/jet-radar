@@ -123,6 +123,27 @@ app.layout = html.Div(
 ])])
 
 
+@app.callback(
+    [Output("celeb-info-text-name", "children"),
+     Output("celeb-info-text-gender", "children"),
+     Output("celeb-info-text-age", "children"),
+     Output("celeb-info-text-worth", "children"),
+     
+    ],
+    Input("celeb-dropdown", "value"),
+)
+def swap_celebrity(dropdown_value:str)->None:
+    """ This is a callback for the dropdown list to pipe data into all the elements """
+    celeb_name = " ".join([x[0].upper() + x[1:] for x in dropdown_value.split('_')])
+    name_string = "Name: " + celeb_name
+    
+    
+    
+    return name_string, 
+
+    
+
+
 if __name__ == "__main__":
     app.run_server(debug=True, host="0.0.0.0", port=8080, use_reloader=True)
 
