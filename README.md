@@ -45,7 +45,7 @@
 
 ## Introduction 🌍✈️
 
-Welcome to MUSK-JET! This repository houses a data collection and visualization system that utilizes the ADS-B Exchange API to gather live data from private aircraft. By creating a robust pipeline and leveraging the Dash framework, MUSK-JET allows you to store, analyze, and visualize real-time data related to aircraft, their owners and ultimately... their environmental impact.
+Welcome to MUSK-JET! This repository houses a data collection and visualisation system that utilizes the ADS-B Exchange API to gather live data from private aircraft. By creating a robust pipeline and leveraging the Dash framework, MUSK-JET allows you to store, analyze, and visualize real-time data related to aircraft, their owners and ultimately... their environmental impact.
 
 ### Our Purpose
 
@@ -61,15 +61,17 @@ At MUSK-JET, our purpose is to raise awareness about the carbon emissions genera
 
 ## Getting Started
 
-To view our live Dashboard please click on image below:
+To view our live Dashboard please click on the image below 👇:
 
 [![airplane door](https://twistedsifter.com/wp-content/uploads/2022/01/Screen-Shot-2022-01-06-at-8.33.44-AM.png?w=1024)](https://www.youtube.com/watch?v=xvFZjo5PgG0)
+
+Want to launch your own MUSK-JET data collection and visualisation system? Or do you want to contribute to the project? Follow the guidelines in the next sections 👇:
 
 ### Prerequisites
 
 Before you begin, ensure that you have the following prerequisites installed:
 
-- Python (version 3.6 or above) <a href="https://www.python.org/downloads/"><img src="https://www.python.org/static/community_logos/python-logo-generic.svg" height="20" alt="Python Logo"></a>
+- Python (version 3.6 or above) <a href="https://www.python.org/downloads/"><img src="https://www.python.org/static/community_logos/python-logo-generic.svg" height="20" alt="Python Logo"></a> <-- click to download
 - Pip (a package installer for Python)
 
 ### Installation
