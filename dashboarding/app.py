@@ -16,6 +16,10 @@ from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
 load_dotenv()
 TEMP_FLIGHT = {'Location': ['Start', 'End'], 'lat': [30, 40], 'long': [-90, -80]}
+DEFAULT_NAME="Elon Musk"
+DEFAULT_GENDER="Male"
+DEFAULT_AGE = 51
+DEFAULT_WORTH="180000 M"
 
 
 
@@ -46,10 +50,10 @@ app.layout = html.Div(
                              html.Img(id='celeb-img', src='assets/celeb_photos/elon_musk.jpg'),
                              html.Div(id="celeb-info", children=[
                                  html.Ul(id='celeb-info-list', children=[
-                                    html.Li(id='celeb-info-text-name', children=f"Name: Elon Musk"),
-                                    html.Li(id='celeb-info-text-gender', children=f"Gender: Male"),
-                                    html.Li(id='celeb-info-text-age', children=f"Age: 51"),
-                                    html.Li(id='celeb-info-text-worth', children=f"Worth: 180000 M")]),
+                                    html.Li(id='celeb-info-text-name', children=f"Name: {DEFAULT_NAME}"),
+                                    html.Li(id='celeb-info-text-gender', children=f"Gender: {DEFAULT_GENDER}"),
+                                    html.Li(id='celeb-info-text-age', children=f"Age: {DEFAULT_AGE}"),
+                                    html.Li(id='celeb-info-text-worth', children=f"Worth: {DEFAULT_WORTH}")]),
                                  ]),
                             html.Div(id="flights-tracked-container", className="container", children=[
                                 html.P(id="num-flights-tracked",className="box", children="# of flights tracked is: "),
