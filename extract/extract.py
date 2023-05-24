@@ -50,7 +50,7 @@ def convert_flight_list_to_df(flights:list[dict]) -> DataFrame:
 
     flight_list = []
     for flight in flights:
-        # #i.e if plane is in the air, add flight details in appropriate format
+        # i.e if plane is in the air, add flight details in appropriate format
         if flight["ac"] != []:
             flight_list.append(get_flight_params(flight))
     return pd.DataFrame(flight_list)

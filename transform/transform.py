@@ -300,26 +300,28 @@ def handler(event = None, context = None) -> None:
     """AWS lambda handler function that loads in json data, reads from the staging db and
     inserts flights, airports and owners into production db."""
 
+    # Load data sets from S3
     airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON, S3_BUCKET_NAME))
     aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON, S3_BUCKET_NAME)
     jet_owners_data = load_json_file_from_s3(JET_OWNERS_JSON, S3_BUCKET_NAME)
 
+    # Establish db connections
     staging_conn = get_db_connection(STAGING_SCHEMA)
     production_conn = get_db_connection(PRODUCTION_SCHEMA)
 
+    # Insert airport data if it's not already there
     insert_airport_info(production_conn, airport_data)
 
+    # Insert jet owner data if it's not already there or if it's been updated
     insert_jet_owner_info(production_conn, aircraft_data, jet_owners_data)
 
+    # Insert all completed flights from past 24 hours
     insert_todays_flights(production_conn, staging_conn, airport_data, aircraft_data)
 
+    # Commit changes to the dbs
     production_conn.commit()
     staging_conn.commit()
 
+    # Close the db connections
     production_conn.close()
     staging_conn.close()
-
-
-
-if __name__ == "__main__":
-    pass

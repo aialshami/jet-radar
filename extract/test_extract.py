@@ -3,7 +3,6 @@ import pytest
 from unittest.mock import MagicMock, patch
 import os
 from datetime import datetime
-from moto import mock_s3
 
 from extract import get_flights_for_all_celebs, get_flight_params, get_celeb_json, get_current_flight_for_icao
 
