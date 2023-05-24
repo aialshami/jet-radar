@@ -48,12 +48,14 @@ def load_json_file_from_s3(file_name: str, bucket_name: str = config["S3_BUCKET_
     return json.load(s3_session.open(path=f"{bucket_name}/{file_name}"))
 
 
-def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
+def extract_todays_flights(conn: connection) -> list[tuple]:
     """Parses events from staging db and extracts flight number, tail number, departure time/location
     and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
     tracked_event_df = pd.read_sql("SELECT * FROM tracked_event;", conn)
     curs = conn.cursor(cursor_factory=RealDictCursor)
+
+    parsed_flights = []
 
     jets = tracked_event_df["aircraft_reg"].unique()
     for jet in jets:
@@ -79,9 +81,12 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
 
             emergency = flight[-1]["emergency"]
 
-            yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
+            parsed_flights.append((jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency))
             curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND flight_no = %s",
                         (jet, flight_no))
+            
+    curs.close()
+    return parsed_flights
 
 
 
