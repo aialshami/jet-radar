@@ -7,7 +7,9 @@ from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_
 from db_connections import get_data_as_dataframe, SQLconnection
 from conversion_metrics import get_age_from_birthdate
 from conversion_metrics import get_celeb_info, get_number_of_flights
-from conversion_metrics import infographic_text
+from conversion_metrics import get_new_infographic_text
+
+import numpy as np
 
 from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
@@ -74,8 +76,8 @@ app.layout = html.Div(
                                     ]),
                              
                              html.Div(id="infographic-box", className="container", children=[
-                                 dcc.Interval(id="refresh_infographic", interval=1*1000, n_intervals=0),
-                                 html.P(id='infographic-text', className="box", children=infographic_text(previous=""))
+                                 dcc.Interval(id="refresh_infographic", interval=5*1000, n_intervals=0),
+                                 html.P(id='infographic-text', className="box", children="The infographic text will go here")
                              ]),
                              html.Div(id="small-analytics-container", children=[
                                  html.Div(id="co2-graph-container", children=[
@@ -120,7 +122,6 @@ app.layout = html.Div(
      Output("celeb-info-text-worth", "children"),
      Output("celeb-img", "src"),
      Output("num-flights-tracked", "children"),
-
     ],
     Input("celeb-dropdown", "value"),
 )
@@ -137,12 +138,18 @@ def swap_celebrity(dropdown_value:str):
 
 @app.callback(
     Output("infographic-text", "children"),
+    Input("infographic-text", "children"),
     Input("refresh_infographic", "n_intervals"),
 )
-def swap_infographic(n_intervals:str):
-    """ Swaps the infographic image every 5 seconds """
-
-    return f"The interval is this {n_intervals}"
+def swap_infographic(n_intervals:str, previous_text:str) -> str:
+    """ Swaps the infographic image every 5 seconds between CO2, cost, fuel volume, and time """
+    previous_text = np.random.choice(["co2", "cost", "fuel", "time"])
+    
+    for quantity in ["co2", "cost", "fuel", "time"]:
+        if quantity in previous_text.lower():
+            new_text = get_new_infographic_text(previous=quantity)
+            break
+    return new_text
 
 
 
