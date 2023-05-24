@@ -3,7 +3,6 @@ into the production database using airports data, aircraft data and tracked owne
 import json
 import os
 from datetime import datetime
-from typing import Generator
 import country_converter as coco
 import psycopg2
 from psycopg2.extras import RealDictCursor
