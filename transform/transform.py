@@ -21,9 +21,10 @@ config = os.environ
 
 AIRPORTS_JSON = "airports.json"
 AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
-JET_OWNERS_JSON = config["CELEB_INFO"]
-STAGING_SCHEMA = config["STAGING_SCHEMA"]
-PRODUCTION_SCHEMA = config["PRODUCTION_SCHEMA"]
+JET_OWNERS_JSON = "celeb_planes.json"
+STAGING_SCHEMA = "staging"
+PRODUCTION_SCHEMA = "production"
+S3_BUCKET_NAME = "jet-bucket"
 
 
 def get_db_connection(schema: str) -> connection:
@@ -38,7 +39,7 @@ def get_db_connection(schema: str) -> connection:
                             options = f"-c search_path={schema}")
 
 
-def load_json_file_from_s3(file_name: str, bucket_name: str = config["S3_BUCKET_NAME"]) -> list | dict:
+def load_json_file_from_s3(file_name: str, bucket_name: str) -> list | dict:
     """Reads a json file from an s3 bucket and returns the object. Requires the names of the bucket
     and file as strings."""
 
@@ -48,12 +49,14 @@ def load_json_file_from_s3(file_name: str, bucket_name: str = config["S3_BUCKET_
     return json.load(s3_session.open(path=f"{bucket_name}/{file_name}"))
 
 
-def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
+def extract_todays_flights(conn: connection) -> list[tuple]:
     """Parses events from staging db and extracts flight number, tail number, departure time/location
     and arrival time/location. Yields these values as a tuple. Expects staging DB connection object."""
 
     tracked_event_df = pd.read_sql("SELECT * FROM tracked_event;", conn)
     curs = conn.cursor(cursor_factory=RealDictCursor)
+
+    parsed_flights = []
 
     jets = tracked_event_df["aircraft_reg"].unique()
     for jet in jets:
@@ -79,10 +82,12 @@ def extract_todays_flights(conn: connection) -> Generator[tuple, None, None]:
 
             emergency = flight[-1]["emergency"]
 
-            yield jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency
+            parsed_flights.append((jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency))
             curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND flight_no = %s",
                         (jet, flight_no))
-
+            
+    curs.close()
+    return parsed_flights
 
 
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
@@ -296,9 +301,9 @@ def handler(event = None, context = None) -> None:
     """AWS lambda handler function that loads in json data, reads from the staging db and
     inserts flights, airports and owners into production db."""
 
-    airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON))
-    aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON)
-    jet_owners_data = load_json_file_from_s3(JET_OWNERS_JSON)
+    airport_data = clean_airport_data(load_json_file_from_s3(AIRPORTS_JSON, S3_BUCKET_NAME))
+    aircraft_data = load_json_file_from_s3(AIRCRAFTS_JSON, S3_BUCKET_NAME)
+    jet_owners_data = load_json_file_from_s3(JET_OWNERS_JSON, S3_BUCKET_NAME)
 
     staging_conn = get_db_connection(STAGING_SCHEMA)
     production_conn = get_db_connection(PRODUCTION_SCHEMA)
@@ -315,3 +320,7 @@ def handler(event = None, context = None) -> None:
     production_conn.close()
     staging_conn.close()
 
+
+
+if __name__ == "__main__":
+    pass

@@ -1,12 +1,11 @@
 """Tests for transform module and it's utility functions."""
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
+from unittest.mock import patch, MagicMock
 from psycopg2.extensions import connection
-from transform import *
+from psycopg2.extras import RealDictCursor
+import pandas as pd
+from transform import extract_todays_flights
 from utilities import haversine_distance, find_nearest_airport, calculate_fuel_consumption
-
-
-load_dotenv()
 
 
 def test_antipodal_haversine_distance_is_half_circumference_of_earth():
@@ -51,20 +50,18 @@ def test_fuel_usage_of_GA5C(aircraft_data):
     assert round(calculate_fuel_consumption(test_dep_time, test_arr_time, "GA5C", aircraft_data)) == 3105
 
 
-def test_staging_db_connection(staging_db_connection):
-    """Checks the connection to the staging database."""
-    assert isinstance(staging_db_connection, connection)
+@patch('pandas.read_sql')
+def test_extract_flights_creates_cursor(mock_read):
+    """Checks that a cursor is created and cursor execute is called."""
+    mocked_db_connection = MagicMock()
+    mocked_cursor = mocked_db_connection.cursor
+    mocked_cursor_execute = mocked_cursor.return_value.execute
 
+    mocked_df = pd.DataFrame({"aircraft_reg": [1], "flight_no": [1], "time_input": [datetime.now()-timedelta(hours=3)],
+                              "lat": [1], "lon": [1], "emergency": [None]})
+    mock_read.return_value = mocked_df
 
-def test_production_db_connection(production_db_connection):
-    """Checks the connection to the production database."""
-    assert isinstance(production_db_connection, connection)
+    extract_todays_flights(mocked_db_connection)
 
-
-def test_load_airport_data_from_s3(airport_data):
-    """Checks that the airport data is successfully retrieved from S3."""
-    assert isinstance(airport_data, dict) and "iata" in list(airport_data.values())[0]
-
-def test_load_aircraft_data_from_s3(aircraft_data):
-    """Checks that the aircraft data is successfully retrieved from S3."""
-    assert isinstance(aircraft_data, dict) and "galph" in list(aircraft_data.values())[0]
+    mocked_cursor.assert_called_with(cursor_factory=RealDictCursor)
+    mocked_cursor_execute.assert_called()
