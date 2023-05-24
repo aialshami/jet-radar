@@ -42,8 +42,9 @@ UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9",
            "money":"\U0001F4B0", "film":"\U0001F3A5", "sweets":"\U0001F36C", 
            "shopping": "\U0001F6D2", "tea":"\U00002615", "beer": "\U0001F37A"}
 
-co2_per_gallon_fuel = 0.01 #mtCO2 i.e metric tons of co2
+CO2_PER_GALLON = 0.01 #mtCO2 i.e metric tons of co2
 AVG_CO2_COMMUTE = 0.00496 #mtCo2 src: https://www.climatepartner.com/en/news/how-sustainable-commuting-can-improve-a-company-carbon-footprint#:~:text=Due%20to%20its%20significant%20impact,per%20commuting%20employee%20per%20day.
+AVG_FUEL_COST = 5.91 #https://www.airnav.com/fuel/report.html
 
 def infographic_co2(metric_ton_co2: float) -> str:
     """ Converts the CO2 of a flight to a an infographic metric """
@@ -54,10 +55,9 @@ def infographic_co2(metric_ton_co2: float) -> str:
     elif metric == "trees":
         return "trees"
     elif metric == "normal_flights":
-        return "comapre to commercial flights"
+        return "compare to commercial flights"
     else:
         raise ValueError("Something went seriously wrong with the random")
-
 
 
 def get_age_from_birthdate(birthdate: np.datetime64) -> int:
@@ -73,7 +73,6 @@ def get_age_from_birthdate(birthdate: np.datetime64) -> int:
         unix_epoch = np.datetime64(0, 's')
         seconds_since_epoch = (birthdate - unix_epoch) / np.timedelta64(1, 's')
         birthdate = datetime.utcfromtimestamp(seconds_since_epoch)
-
         return floor((datetime.now()-birthdate).days/365)
     else:
         raise ValueError("Birthdate not in the correct format")
@@ -91,21 +90,31 @@ def get_net_worth_as_million_dollars(worth: int) -> str:
     return f"${round(worth/10**6)}M"
 
 
-def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:DataFrame) -> dict:
+def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_df:DataFrame, airport) -> dict:
     """ For a given person return the useful data of the most recent flight they've completed.
-        In progress flights will not appear until the next running of prod. Lambda
+        In progress flights will not appear until the next running of prod. Lambda.
     """
-    
-    output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
-                   "start":None, "end": None, "time_taken": None}
+    owner_aircraft_df = pd.merge(owner, aircraft_df, on="owner_id")
+    flight_merge_df = pd.merge(flight_df, owner_aircraft_df, on="tail_number")
+    combined_df = pd.merge(flight_merge_df, airport, left_on= "dep_airport_id", right_on="airport_id", suffixes=("_owner","_dep_airport"))
+    combined_df = pd.merge(combined_df, airport, left_on= "arr_airport_id", right_on="airport_id", suffixes=("_dep_airport","_arr_airport"))
 
-    combined_df = pd.merge(flights, aircraft, on='tail_number')
-    owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
-    sorted_flights = owners_flights.sort_values(by='arr_time', ascending=False)
+    fuel_df = combined_df.filter([
+        "fuel_usage","lat_dep_airport","lon_dep_airport",
+        "lat_arr_airport","lon_arr_airport"]).head(5)
 
-    if not sorted_flights.empty:
-        most_recent = sorted_flights[0]
-        output_dict["flight_id"] = most_recent[""]
+    return fuel_df.to_dict()
+    # output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
+    #                "start":None, "end": None, "time_taken": None}
+
+
+    # combined_df = pd.merge(flights, aircraft, on='tail_number')
+    # owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
+    # sorted_flights = owners_flights.sort_values(by='arr_time', ascending=False)
+
+    # if not sorted_flights.empty:
+    #     most_recent = sorted_flights[0]
+    #     output_dict["flight_id"] = most_recent[""]
 
 
 
