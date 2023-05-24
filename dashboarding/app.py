@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from dash.dependencies import Input, Output, State
 from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_average, number_of_flights_over_time, create_flight_map
 from db_connections import get_data_as_dataframe, SQLconnection
-from conversion_metrics import get_age_from_birthdate
+from conversion_metrics import get_age_from_birthdate, get_most_recent_flight_info
 from conversion_metrics import get_celeb_info
 
 from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
@@ -31,12 +31,15 @@ gender_df = get_data_as_dataframe(sql_conn, "gender")
 airport_df=get_data_as_dataframe(sql_conn, "airport")
 
 # Derive display values for celeb
-owner = owner_df[owner_df["name"] == "Elon Musk"]
+
 name, age = 'Elon Musk', 51
 print(name, age)
 gender = "Male"
 worth = "180M ish"
 print(gender, worth)
+owner = owner_df[owner_df["name"] == "A-rod"]
+
+print(get_most_recent_flight_info(owner, flight_df, aircraft_df, airport_df))
 
 # HTML document
 app.layout = html.Div(
@@ -130,6 +133,8 @@ def swap_celebrity(dropdown_value:str)->None:
     
     
     return celeb_info
+
+
 
     
 

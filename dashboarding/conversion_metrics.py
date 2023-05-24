@@ -38,7 +38,7 @@ def infographic_co2(metric_ton_co2: float) -> str:
     elif metric == "trees":
         return "trees"
     elif metric == "normal_flights":
-        return "comapre to commercial flights"
+        return "compare to commercial flights"
     else:
         raise ValueError("Something went seriously wrong with the random")
 
@@ -93,6 +93,7 @@ def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_
     flight_merge_df = pd.merge(flight_df, owner_aircraft_df, on="tail_number")
     airport_merge_ff = pd.merge(flight_merge_df, airport, left_on= "dep_airport_id", right_on="airport_id")
     combined_df = pd.merge(flight_merge_df, airport, left_on= "arr_airport_id", right_on="airport_id")
+    
     # output_dict = {
     #     "fuel_usage"=[],
     # }
