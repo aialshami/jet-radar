@@ -65,11 +65,15 @@ def get_age_from_birthdate(birthdate: np.datetime64) -> int:
 
 def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[str]:
     """Return the name/gender/age/worth with prefix attached """
+    if name == "Jay Z":
+        name = name.replace(" ", "-")
+    elif name.lower() =="a rod":
+        name = "A-rod"
+
     owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
-    
     gender = gender_df[gender_df["gender_id"] == owner_record['gender_id'].values[0]].values[0][1] # This pulls gender text
     age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
-    worth = str(owner_record["est_net_worth"].values[0]/10**6) + "M"
+    worth = str(round(owner_record["est_net_worth"].values[0]/10**6)) + "M"
 
     return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
     
