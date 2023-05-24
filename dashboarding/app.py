@@ -26,9 +26,10 @@ aircraft_df = get_data_as_dataframe(sql_conn, "aircraft")
 model_df = get_data_as_dataframe(sql_conn, "model")
 flight_df = get_data_as_dataframe(sql_conn, "flight")
 gender_df = get_data_as_dataframe(sql_conn, "gender")
+airport_df=get_data_as_dataframe(sql_conn, "airport")
 
 # Derive display values for celeb
-owner = owner_df[owner_df["name"] == "Elon Musk"]
+owner = owner_df[owner_df["name"] == "A-rod"]
 name, age = 'Elon Musk', get_age_from_birthdate(owner["birthdate"].values[0])
 print(name, age)
 gender = get_gender_from_id(owner["gender_id"].values[0], gender_df)
@@ -39,9 +40,10 @@ print(gender, worth)
 fuel_used, co2_used = "no full flight found", "no full flight found"
 flight_cost, flight_time = "no full flight found", "no full flight found"
 
-most_recent_flight = get_most_recent_flight_info(owner, flight_df, aircraft_df)
-if most_recent_flight is not None:
-    fuel_used = most_recent_flight['fuel_used']
+most_recent_flight = get_most_recent_flight_info(owner, flight_df, aircraft_df, aircraft_df)
+print(most_recent_flight)
+# if most_recent_flight is not None:
+#     fuel_used = most_recent_flight['fuel_used']
 
 
 

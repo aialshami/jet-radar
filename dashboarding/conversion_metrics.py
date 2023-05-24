@@ -39,7 +39,6 @@ def infographic_co2(metric_ton_co2: float) -> str:
         raise ValueError("Something went seriously wrong with the random")
 
 
-
 def get_age_from_birthdate(birthdate: str) -> int:
     """ Converts stored birthdate to numerical age (initially yyyy-mm-dd)"""
     if isinstance(birthdate, str) and '-' in birthdate:
@@ -64,23 +63,33 @@ def get_gender_from_id(gender_id:float, gender_df: DataFrame) -> str:
     gender_row = gender_df[gender_df["gender_id"] == gender_id]
     return gender_row["name"].values[0]
 
+
 def get_net_worth_as_million_dollars(worth: int) -> str:
     """ Returns net worth as N millions (i.e 180 *10^6 -> 180M) """
     return f"${round(worth/10**6)}M"
 
 
-def get_most_recent_flight_info(owner:DataFrame, flights: DataFrame, aircraft:DataFrame) -> dict:
+def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_df:DataFrame, airport) -> dict:
     """ For a given person return the useful data of the most recent flight they've completed.
         In progress flights will not appear until the next running of prod. Lambda
     """
 
-    output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
-                   "start":None, "end": None, "time_taken": None}
-    
-    combined_df = pd.merge(flights, aircraft, on='tail_number')
-    owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
-    sorted_flights = owners_flights.sort_values(by='arr_time', ascending=False)
+    owner_aircraft_df = pd.merge(owner, aircraft_df, on="owner_id")
+    flight_merge_df = pd.merge(flight_df, owner_aircraft_df, on="tail_number")
+    airport_merge_ff = pd.merge(flight_merge_df, airport, left_on= "dep_airport_id", right_on="airport_id")
+    combined_df = pd.merge(flight_merge_df, airport, left_on= "arr_airport_id", right_on="airport_id")
+    # output_dict = {
+    #     "fuel_usage"=[],
+    # }
 
-    if not sorted_flights.empty:
-        most_recent = sorted_flights[0]
-        output_dict["flight_id"] = most_recent[""]
+    return combined_df
+    # output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
+    #                "start":None, "end": None, "time_taken": None}
+
+    # combined_df = pd.merge(flights, aircraft, on='tail_number')
+    # owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
+    # sorted_flights = owners_flights.sort_values(by='arr_time', ascending=False)
+
+    # if not sorted_flights.empty:
+    #     most_recent = sorted_flights[0]
+    #     output_dict["flight_id"] = most_recent[""]
