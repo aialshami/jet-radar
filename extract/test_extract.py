@@ -1,3 +1,4 @@
+"""Unit tests for extract module."""
 import pytest
 from unittest.mock import MagicMock, patch
 import os
