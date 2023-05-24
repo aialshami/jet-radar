@@ -1,8 +1,10 @@
 import pytest
 from unittest.mock import MagicMock, patch
+import os
 from datetime import datetime
+from moto import mock_s3
 
-from extract import get_flights_for_all_celebs, get_flight_params
+from extract import get_flights_for_all_celebs, get_flight_params, get_celeb_json
 
 
 def test_celebs_have_expected_plane_info(celeb_planes_data):
@@ -39,5 +41,24 @@ def test_get_flight_params_unix_conversion():
     assert get_flight_params(data)["time_input"] == datetime(1970, 1, 1, 0, 0, 0, 1000)
 
 
-def test_get_celeb_json_from_s3():
+@patch("boto3.resource")
+def test_get_celeb_json_from_s3(mocked_s3):
     """"""
+    os.environ["S3_BUCKET_NAME"] = "test_bucket"
+    os.environ["CELEB_INFO"] = "test"
+    mock_bucket = mocked_s3.return_value.Object # When you make resource, and ask it for an object
+    mock_readable = MagicMock()
+    mock_readable.read.return_value = '{"please": "work"}'
+    mock_bucket.return_value.get.return_value = {"Body": mock_readable} # When you get an object from a resource and ask it for a get
+    data = get_celeb_json()
+
+    assert data == {"please": "work"}
+
+
+"""@patch("boto3.resource")
+def test_get_celeb_json_from_s3(mocked_s3):
+    """"""
+    mocked_s3 = mock_s3()
+
+    assert data == {}"""
+    

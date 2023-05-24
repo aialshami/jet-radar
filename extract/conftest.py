@@ -1,6 +1,9 @@
 import pytest
 import os
 import json
+from unittest.mock import MagicMock
+from moto import mock_s3
+import boto3
 
 
 def clean_airport_data(airport_info: list[dict]) -> dict[dict]:

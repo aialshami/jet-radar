@@ -17,7 +17,9 @@ def get_celeb_json() -> dict:
     s3_bucket = boto3.resource('s3')
 
     obj = s3_bucket.Object(config["S3_BUCKET_NAME"], config["CELEB_INFO"])
-    celeb_json = json.load(obj.get()['Body'])
+    data = obj.get()
+    print(s3_bucket, obj, data)
+    celeb_json = json.load(data['Body'])
     return celeb_json
 
 
