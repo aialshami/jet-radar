@@ -21,9 +21,9 @@ config = os.environ
 
 AIRPORTS_JSON = "airports.json"
 AIRCRAFTS_JSON= "aircraft_fuel_consumption_rates.json"
-JET_OWNERS_JSON = config["CELEB_INFO"]
-STAGING_SCHEMA = config["STAGING_SCHEMA"]
-PRODUCTION_SCHEMA = config["PRODUCTION_SCHEMA"]
+JET_OWNERS_JSON = "celeb_planes.json"
+STAGING_SCHEMA = "staging"
+PRODUCTION_SCHEMA = "production"
 
 
 def get_db_connection(schema: str) -> connection:
