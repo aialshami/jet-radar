@@ -37,7 +37,6 @@ gender = "Male"
 worth = "180M ish"
 print(gender, worth)
 
-
 # HTML document
 app.layout = html.Div(
     id="root",
