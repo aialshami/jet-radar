@@ -6,7 +6,8 @@ from dash.dependencies import Input, Output, State
 from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_average, number_of_flights_over_time, create_flight_map
 from db_connections import get_data_as_dataframe, SQLconnection
 from conversion_metrics import get_age_from_birthdate, get_most_recent_flight_info
-from conversion_metrics import get_celeb_info, get_number_of_flights
+from conversion_metrics import get_celeb_info, get_total_number_of_flights
+from conversion_metrics import get_flight_cost, get_flight_co2, get_flight_time
 
 from conversion_metrics import get_new_infographic_text
 
@@ -16,19 +17,10 @@ import numpy as np
 from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
 load_dotenv()
-TEMP_FLIGHT = {'Location': ['Start', 'End'], 'lat': [30, 40], 'long': [-90, -80]}
-DEFAULT_NAME="Elon Musk"
-DEFAULT_GENDER="Male"
-DEFAULT_AGE = 51
-DEFAULT_WORTH="180000 M"
-
-
 
 app = Dash(__name__, use_pages=False)
 app.title = "MuskJet 2.0"
 server = app.server
-
-PAST_FLIGHTS = [1, 2, 3, 4, 5, 6]
 
 # Get data
 sql_conn = SQLconnection(config=os.environ)
@@ -39,14 +31,14 @@ flight_df = get_data_as_dataframe(sql_conn, "flight")
 gender_df = get_data_as_dataframe(sql_conn, "gender")
 airport_df=get_data_as_dataframe(sql_conn, "airport")
 
-# Derive display values for celeb
+TEMP_FLIGHT = {'Location': ['Start', 'End'], 'lat': [30, 40], 'long': [-90, -80]}
+DEFAULT_NAME="Elon Musk"
+DEFAULT_GENDER="Male"
+DEFAULT_AGE = 51
+DEFAULT_WORTH="180000 M"
 
-name, age = 'Elon Musk', 51
-print(name, age)
-gender = "Male"
-worth = "180M ish"
-print(gender, worth)
-owner = owner_df[owner_df["name"] == "A-rod"]
+PAST_FLIGHTS = [1, 2, 3, 4, 5]
+MOST_RECENT_FLIGHTS= get_most_recent_flight_info(owner_df[owner_df["name"] == DEFAULT_NAME], flight_df, aircraft_df, airport_df)
 
 
 # HTML document
@@ -137,8 +129,11 @@ app.layout = html.Div(
      Output("celeb-info-text-worth", "children"),
      Output("celeb-img", "src"),
      Output("num-flights-tracked", "children"),
-     Output("previous-flight-slider", "min"),
-     Output("previous-flight-slider", "max"),
+
+     Output("cost-div", "children"),
+     Output("co2-div", "children"),
+     Output("fuel-div", "children"),
+     Output("time-div", "children"),
     ],
     Input("celeb-dropdown", "value"),
 )
@@ -147,13 +142,17 @@ def swap_celebrity(dropdown_value:str):
     celeb_name = " ".join([x[0].upper() + x[1:] for x in dropdown_value.split('_')])
     name, gender, age, worth = get_celeb_info(celeb_name, owner_df, gender_df)
     celeb_img = f"assets/celeb_photos/{dropdown_value}.jpg"
-    number_of_flights_tracked = get_number_of_flights(celeb_name, owner_df, aircraft_df, flight_df)
+    number_of_flights_tracked = get_total_number_of_flights(celeb_name, owner_df, aircraft_df, flight_df)
     
-    minimum_number_flights = 1
-    maximum_number_flights = 5
+    MOST_RECENT_FLIGHTS = get_most_recent_flight_info(owner_df[owner_df["name"] == celeb_name], flight_df, aircraft_df, airport_df)
+    
+    flight_cost = f"This flight cost ${get_flight_cost(MOST_RECENT_FLIGHTS['fuel_usage'][0])}"
+    flight_co2 = f"This flight used {get_flight_co2(MOST_RECENT_FLIGHTS['fuel_usage'][0])} mtCO2"
+    flight_fuel = f"This flight used {get_flight_co2(MOST_RECENT_FLIGHTS['fuel_usage'][0])} gal of fuel"
+    flight_time = f"This flight took {get_flight_time(MOST_RECENT_FLIGHTS['dep_time'][0],MOST_RECENT_FLIGHTS['arr_time'][0])}"
 
-    return name, gender, age, worth, celeb_img, number_of_flights_tracked, minimum_number_flights, \
-            maximum_number_flights
+    return name, gender, age, worth, celeb_img, number_of_flights_tracked,\
+            flight_cost, flight_co2, flight_fuel, flight_time
 
 
 
@@ -171,8 +170,6 @@ def swap_infographic(n_intervals:str, previous_text:str) -> str:
             new_text = get_new_infographic_text(previous=quantity)
             break
     return new_text
-
-
 
 
 if __name__ == "__main__":
