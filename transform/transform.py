@@ -89,7 +89,6 @@ def extract_todays_flights(conn: connection) -> list[tuple]:
     return parsed_flights
 
 
-
 def insert_airport_info(conn: connection, airport_info: dict[dict]) -> None:
     """Inserts airport data into production db and populates country/ continent tables.
     Expects the production db connection object and the airport data."""
