@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_average, number_of_flights_over_time, create_flight_map
 from db_connections import get_data_as_dataframe, SQLconnection
 from conversion_metrics import get_age_from_birthdate
-from conversion_metrics import get_celeb_info
+from conversion_metrics import get_celeb_info, get_number_of_flights
 
 from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
@@ -52,7 +52,7 @@ app.layout = html.Div(
                                     html.Li(id='celeb-info-text-worth', children=f"Worth: {worth}")]),
                                  ]),
                             html.Div(id="flights-tracked-container", className="container", children=[
-                                html.P(id="num-flights-tracked",className="box", children="# of flights tracked is: 5"),
+                                html.P(id="num-flights-tracked",className="box", children="# of flights tracked is: "),
                             ]),
                         ]),
                 html.Div(id="center-column",
@@ -63,6 +63,7 @@ app.layout = html.Div(
                                         options=CELEB_DROPDOWN_OPTIONS,
                                         value="elon_musk",
                                         id="celeb-dropdown",
+                                        clearable=False
                                     ),
                              html.Div(id="flight-info-box", className="container", children=[
                                         html.Div(id="cost-div", className="box", children=f"This flight cost: ${1}"),
@@ -115,20 +116,21 @@ app.layout = html.Div(
      Output("celeb-info-text-gender", "children"),
      Output("celeb-info-text-age", "children"),
      Output("celeb-info-text-worth", "children"),
-     Output("celeb-img", "src")
-     
+     Output("celeb-img", "src"),
+     Output("num-flights-tracked", "children"),
+
     ],
     Input("celeb-dropdown", "value"),
 )
-def swap_celebrity(dropdown_value:str)->None:
+def swap_celebrity(dropdown_value:str):
     """ This is a callback for the dropdown list to pipe data into all the elements """
     celeb_name = " ".join([x[0].upper() + x[1:] for x in dropdown_value.split('_')])
     name, gender, age, worth = get_celeb_info(celeb_name, owner_df, gender_df)
     celeb_img = f"assets/celeb_photos/{dropdown_value}.jpg"
+    number_of_flights_tracked = get_number_of_flights(celeb_name, owner_df, aircraft_df, flight_df)
     
-    return name, gender, age, worth, celeb_img
+    return name, gender, age, worth, celeb_img, number_of_flights_tracked
 
-    
 
 
 if __name__ == "__main__":
