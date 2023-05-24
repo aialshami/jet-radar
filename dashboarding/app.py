@@ -7,7 +7,6 @@ from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_
 from db_connections import get_data_as_dataframe, SQLconnection
 from conversion_metrics import get_age_from_birthdate
 from conversion_metrics import get_celeb_info, get_number_of_flights
-
 from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
 load_dotenv()
@@ -63,7 +62,9 @@ app.layout = html.Div(
                                         options=CELEB_DROPDOWN_OPTIONS,
                                         value="elon_musk",
                                         id="celeb-dropdown",
+
                                         clearable=False
+
                                     ),
                              html.Div(id="flight-info-box", className="container", children=[
                                         html.Div(id="cost-div", className="box", children=f"This flight cost: ${1}"),

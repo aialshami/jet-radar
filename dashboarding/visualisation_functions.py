@@ -25,7 +25,7 @@ def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     celeb_name = flight_data["owner"]
     flight_co2 = flight_data["co2"]
 
-    fig = px.bar(x=[avg_co2, flight_co2], y= ['Avg', "Elon"]
+    fig = px.bar(x=[avg_co2, flight_co2], y= ['Avg', celeb_name]
                  ).update_layout(xaxis_title="Tons of CO2", yaxis_visible=False,
                                 margin=dict(l=20, r=20, t=20, b=20), plot_bgcolor='#252e3f')
     return fig
