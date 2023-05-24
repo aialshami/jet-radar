@@ -123,11 +123,10 @@ def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[s
     name = manage_names_with_dashes(name)
 
     owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
-    gender_id = int(owner_record['gender_id'].values[0])
-    gender = get_gender_from_id(gender_id, gender_df)
+    gender = get_gender_from_id(int(owner_record['gender_id'].values[0]), gender_df)
 
     age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
-    worth = str(round(owner_record["est_net_worth"].values[0]/10**6)) + "M"
+    worth = str(round(owner_record["est_net_worth"].values[0]/10**6)) + " M"
 
     return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
 
@@ -139,7 +138,6 @@ def get_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataFrame, 
     owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
     owner_aircraft = aircraft_df[aircraft_df["owner_id"] == owner_record["owner_id"].values[0]]
     relevant_flights = flight_df[flight_df["tail_number"] == owner_aircraft["tail_number"].values[0]]
-    
     return "# of flights tracked is: " + str(len(relevant_flights))
 
 

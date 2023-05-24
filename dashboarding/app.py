@@ -33,10 +33,6 @@ model_df = get_data_as_dataframe(sql_conn, "model")
 flight_df = get_data_as_dataframe(sql_conn, "flight")
 gender_df = get_data_as_dataframe(sql_conn, "gender")
 
-# Derive display values for celeb
-owner = owner_df[owner_df["name"] == "Elon Musk"]
-name, age = 'Elon Musk', 51
-gender, worth = "Male", "180M ish"
 
 # HTML document
 app.layout = html.Div(
@@ -50,10 +46,10 @@ app.layout = html.Div(
                              html.Img(id='celeb-img', src='assets/celeb_photos/elon_musk.jpg'),
                              html.Div(id="celeb-info", children=[
                                  html.Ul(id='celeb-info-list', children=[
-                                    html.Li(id='celeb-info-text-name', children=f"Name: {name}"),
-                                    html.Li(id='celeb-info-text-gender', children=f"Gender: {gender}"),
-                                    html.Li(id='celeb-info-text-age', children=f"Age: {age}"),
-                                    html.Li(id='celeb-info-text-worth', children=f"Worth: {worth}")]),
+                                    html.Li(id='celeb-info-text-name', children=f"Name: Elon Musk"),
+                                    html.Li(id='celeb-info-text-gender', children=f"Gender: Male"),
+                                    html.Li(id='celeb-info-text-age', children=f"Age: 51"),
+                                    html.Li(id='celeb-info-text-worth', children=f"Worth: 180000 M")]),
                                  ]),
                             html.Div(id="flights-tracked-container", className="container", children=[
                                 html.P(id="num-flights-tracked",className="box", children="# of flights tracked is: "),
@@ -62,14 +58,15 @@ app.layout = html.Div(
                 html.Div(id="center-column",
                          children=[
                              html.H4(id="title", children="Visualisation of private jet emissions & costs"),
-                             html.P(id="description", children="It's hard to understand how bad these planes are - this helps."),
+                             html.P(id="description", children="Climate Change is a fundamental political issue, with \
+                                                                75%% of adults in Britain at least somewhat worried about the climate. \
+                                                                It can be difficult to understand the impact that a small set of people \
+                                                                have compared to the rest of us - this tool aims to fix that."),
                              dcc.Dropdown(
                                         options=CELEB_DROPDOWN_OPTIONS,
                                         value="elon_musk",
                                         id="celeb-dropdown",
-
                                         clearable=False
-
                                     ),
                              html.Div(id="flight-info-box", className="container", children=[
                                         html.Div(id="cost-div", className="box", children=f"This flight cost: ${1}"),
@@ -125,6 +122,8 @@ app.layout = html.Div(
      Output("celeb-info-text-worth", "children"),
      Output("celeb-img", "src"),
      Output("num-flights-tracked", "children"),
+     Output("previous-flight-slider", "min"),
+     Output("previous-flight-slider", "max"),
     ],
     Input("celeb-dropdown", "value"),
 )
@@ -135,7 +134,11 @@ def swap_celebrity(dropdown_value:str):
     celeb_img = f"assets/celeb_photos/{dropdown_value}.jpg"
     number_of_flights_tracked = get_number_of_flights(celeb_name, owner_df, aircraft_df, flight_df)
     
-    return name, gender, age, worth, celeb_img, number_of_flights_tracked
+    minimum_number_flights = 1
+    maximum_number_flights = 5
+
+    return name, gender, age, worth, celeb_img, number_of_flights_tracked, minimum_number_flights, \
+            maximum_number_flights
 
 
 
