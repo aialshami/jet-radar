@@ -7,6 +7,7 @@ from visualisation_functions import co2_of_flight_vs_average, cost_of_flight_vs_
 from db_connections import get_data_as_dataframe, SQLconnection
 from conversion_metrics import get_age_from_birthdate
 from conversion_metrics import get_celeb_info, get_number_of_flights
+from conversion_metrics import infographic_text
 
 from conversion_metrics import UNICODE, CELEB_DROPDOWN_OPTIONS
 
@@ -73,7 +74,8 @@ app.layout = html.Div(
                                     ]),
                              
                              html.Div(id="infographic-box", className="container", children=[
-                                 html.P(id='infographic-text', className="box", children="This box will contain infographics on co2 etc")
+                                 dcc.Interval(id="refresh_infographic", interval=1*1000, n_intervals=0),
+                                 html.P(id='infographic-text', className="box", children=infographic_text(previous=""))
                              ]),
                              html.Div(id="small-analytics-container", children=[
                                  html.Div(id="co2-graph-container", children=[
@@ -130,6 +132,18 @@ def swap_celebrity(dropdown_value:str):
     number_of_flights_tracked = get_number_of_flights(celeb_name, owner_df, aircraft_df, flight_df)
     
     return name, gender, age, worth, celeb_img, number_of_flights_tracked
+
+
+
+@app.callback(
+    Output("infographic-text", "children"),
+    Input("refresh_infographic", "n_intervals"),
+)
+def swap_infographic(n_intervals:str):
+    """ Swaps the infographic image every 5 seconds """
+
+    return f"The interval is this {n_intervals}"
+
 
 
 

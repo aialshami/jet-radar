@@ -126,4 +126,8 @@ def get_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataFrame, 
     return "# of flights tracked is: " + str(len(relevant_flights))
 
 
+def infographic_text(previous: str):
+    """ Changes the infographic text to the next visualisation emoji prompt """
+    return 10
+
 
