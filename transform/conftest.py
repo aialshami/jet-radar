@@ -26,13 +26,3 @@ def airport_data():
 @pytest.fixture
 def aircraft_data():
     return load_json_from_data_directory("aircraft_fuel_consumption_rates.json")
-
-
-@pytest.fixture
-def staging_db_connection():
-    return get_db_connection(STAGING_SCHEMA)
-
-
-@pytest.fixture
-def production_db_connection():
-    return get_db_connection(PRODUCTION_SCHEMA)
