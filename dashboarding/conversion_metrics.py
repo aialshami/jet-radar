@@ -28,6 +28,7 @@ UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9",
 
 co2_per_gallon_fuel = 0.01 #mtCO2 i.e metric tons of co2
 AVG_CO2_COMMUTE = 0.00496 #mtCo2 src: https://www.climatepartner.com/en/news/how-sustainable-commuting-can-improve-a-company-carbon-footprint#:~:text=Due%20to%20its%20significant%20impact,per%20commuting%20employee%20per%20day.
+AVG_FUEL_COST = 5.91 #https://www.airnav.com/fuel/report.html
 
 def infographic_co2(metric_ton_co2: float) -> str:
     """ Converts the CO2 of a flight to a an infographic metric """
@@ -43,7 +44,6 @@ def infographic_co2(metric_ton_co2: float) -> str:
         raise ValueError("Something went seriously wrong with the random")
 
 
-
 def get_age_from_birthdate(birthdate: np.datetime64) -> int:
     """ Converts stored birthdate to numerical age (initially yyyy-mm-dd)"""
     if isinstance(birthdate, str) and '-' in birthdate:
@@ -57,7 +57,6 @@ def get_age_from_birthdate(birthdate: np.datetime64) -> int:
         unix_epoch = np.datetime64(0, 's')
         seconds_since_epoch = (birthdate - unix_epoch) / np.timedelta64(1, 's')
         birthdate = datetime.utcfromtimestamp(seconds_since_epoch)
-
         return floor((datetime.now()-birthdate).days/365)
     else:
         raise ValueError("Birthdate not in the correct format")
@@ -65,11 +64,15 @@ def get_age_from_birthdate(birthdate: np.datetime64) -> int:
 
 def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[str]:
     """Return the name/gender/age/worth with prefix attached """
+    if name == "Jay Z":
+        name = name.replace(" ", "-")
+    elif name.lower() =="a rod":
+        name = "A-rod"
+
     owner_record = owner_df[owner_df["name"] == name] # gets the owner id for this celeb
-    
     gender = gender_df[gender_df["gender_id"] == owner_record['gender_id'].values[0]].values[0][1] # This pulls gender text
     age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
-    worth = str(owner_record["est_net_worth"].values[0]/10**6) + "M"
+    worth = str(round(owner_record["est_net_worth"].values[0]/10**6)) + "M"
 
     return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
     
@@ -91,16 +94,22 @@ def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_
 
     owner_aircraft_df = pd.merge(owner, aircraft_df, on="owner_id")
     flight_merge_df = pd.merge(flight_df, owner_aircraft_df, on="tail_number")
-    airport_merge_ff = pd.merge(flight_merge_df, airport, left_on= "dep_airport_id", right_on="airport_id")
-    combined_df = pd.merge(flight_merge_df, airport, left_on= "arr_airport_id", right_on="airport_id")
+    combined_df = pd.merge(flight_merge_df, airport, left_on= "dep_airport_id", right_on="airport_id", suffixes=("_owner","_dep_airport"))
+    combined_df = pd.merge(combined_df, airport, left_on= "arr_airport_id", right_on="airport_id", suffixes=("_dep_airport","_arr_airport"))
+    combined_df.to_csv("visual.csv")
+    
+    latest_5 = combined_df["fuel_usage"].head(5)
     
     # output_dict = {
-    #     "fuel_usage"=[],
+    #     "fuel_usage": combined_df["fuel_usage"],
+    #     "flight_cost": combined_df["fuel_usage"]*AVG_FUEL_COST,
+    #     "flight_co2": 
     # }
 
     return combined_df
     # output_dict = {"flight_id":None, "fuel_usage":None, "flight_cost":None, "flight_co2": None, 
     #                "start":None, "end": None, "time_taken": None}
+
 
     # combined_df = pd.merge(flights, aircraft, on='tail_number')
     # owners_flights = combined_df[combined_df['owner_id'] == owner["owner_id"].values[0]]
