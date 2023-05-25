@@ -9,13 +9,13 @@ def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     converted to radians and the distance is calculated using the Haversine formula. 
     r is the radius of the earth. Expects floats and returns a float."""
 
-    r = 6371
+    earth_radius = 6371
     lat1_rad = lat1 * pi/180
     lat2_rad = lat2 * pi/180
     lon1_rad = lon1 * pi/180
     lon2_rad = lon2 * pi/180
 
-    return acos(sin(lat1_rad)*sin(lat2_rad) + cos(lat1_rad)*cos(lat2_rad)*cos(lon2_rad-lon1_rad)) * r
+    return acos(sin(lat1_rad)*sin(lat2_rad) + cos(lat1_rad)*cos(lat2_rad)*cos(lon2_rad-lon1_rad)) * earth_radius
 
 
 def clean_airport_data(airport_info: list[dict]) -> dict[dict]:
