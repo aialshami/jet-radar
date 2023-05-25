@@ -17,7 +17,30 @@ states_geojson = requests.get(
 mapbox_access_token = "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A"
 mapbox_style = "mapbox://styles/plotlymapbox/cjvprkf3t1kns1cqjxuxmwixz"
 
+def default_empty_fig() -> Figure:
+    """ Provides a placeholder figure for when there's no flight data """
+    fig = px.bar(x=[0, 0], y= ['Avg', '-']
+                 ).update_layout(xaxis_title="No Data", yaxis_visible=False,
+                                margin=dict(l=20, r=20, t=20, b=20), plot_bgcolor='#252e3f')
+    return fig
 
+
+def default_flight_fig() -> Figure:
+    """ Provides a placeholder flight map for when there's no flight data """
+    fig = px.scatter_geo(pd.DataFrame(data={'lat': [], 'long': []}), lat='lat', lon='long', projection='orthographic'
+                         ).update_layout(plot_bgcolor='#252e3f', 
+                                         margin=dict(l=20, r=20, t=20, b=20))
+    fig = add_state_lines(fig)
+    fig.update_geos(
+        visible=True, resolution=50, scope="world", showcountries=True, 
+        countrycolor=COUNTRY_LINE_COLOUR)
+    return fig
+
+def number_of_flights_over_time(flights:dict) -> Figure:
+    list_of_days = []
+    print(flights)
+
+    return default_empty_fig()
 
 def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     """ Produces figure contrasting the co2 output of 
@@ -26,7 +49,7 @@ def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     flight_co2 = flight_data["co2"]
 
     fig = px.bar(x=[avg_co2, flight_co2], y= ['Avg', celeb_name]
-                 ).update_layout(xaxis_title="Tons of CO2", yaxis_visible=False,
+                 ).update_layout(xaxis_title="Flight CO2 vs Avg Yearly CO2 for 1000 people", yaxis_visible=False,
                                 margin=dict(l=20, r=20, t=20, b=20), plot_bgcolor='#252e3f')
     return fig
 
@@ -37,8 +60,8 @@ def cost_of_flight_vs_average(flight_data:dict, avg_wage:float) -> Figure:
     flight_cost = flight_data["cost"]
     wage_cost = flight_data["time"] * avg_wage
 
-    fig = px.bar(x=[wage_cost, flight_cost], y= ['Avg', "Elon"]
-                 ).update_layout(xaxis_title="Wage vs Flight cost", yaxis_visible=False,
+    fig = px.bar(x=[wage_cost, flight_cost], y= ['Avg', celeb_name]
+                 ).update_layout(xaxis_title="100 Median Wages over flight time vs Flight cost", yaxis_visible=False,
                                 margin=dict(l=20, r=20, t=20, b=20),plot_bgcolor='#252e3f')
     return fig
 
@@ -53,6 +76,7 @@ def number_of_flights_over_time() -> Figure:
     return fig
 
 def create_flight_map(flight: dict) -> Figure:
+    """ Uses lat/lon of departure/arrival airports to plot a flight path of a celeb """
     midpoint = [(flight['lat'][1] - flight['lat'][0])/2, (flight['long'][1] - flight['long'][0])/2]
     df = pd.DataFrame(data=flight)
 
