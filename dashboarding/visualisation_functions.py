@@ -25,6 +25,15 @@ def default_empty_fig() -> Figure:
     return fig
 
 
+def default_flight_fig() -> Figure:
+    """ Provides a placeholder figure for when there's no flight data """
+    fig = px.scatter_geo(pd.DataFrame(data={'lat': [], 'long': []}), lat='lat', lon='long', projection='orthographic'
+                         ).update_layout(plot_bgcolor='#252e3f', 
+                                         margin=dict(l=20, r=20, t=20, b=20))
+    fig = add_state_lines(fig)
+    return fig
+
+
 def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     """ Produces figure contrasting the co2 output of 
         the previous flight to the daily average """
@@ -59,6 +68,7 @@ def number_of_flights_over_time() -> Figure:
     return fig
 
 def create_flight_map(flight: dict) -> Figure:
+    print(flight['lat'])
     midpoint = [(flight['lat'][1] - flight['lat'][0])/2, (flight['long'][1] - flight['long'][0])/2]
     df = pd.DataFrame(data=flight)
 
