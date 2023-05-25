@@ -84,7 +84,7 @@ def cost_of_flight_vs_average(flight_data:dict, avg_wage:float) -> Figure:
 
 def create_flight_map(flight: dict) -> Figure:
     """ Uses lat/lon of departure/arrival airports to plot a flight path of a celeb """
-    midpoint = [(flight['lat'][1] - flight['lat'][0])/2, (flight['long'][1] - flight['long'][0])/2]
+    midpoint = [(flight['lat'][1] - flight['lat'][0])/2 + flight['lat'][0], (flight['long'][1] - flight['long'][0])/2+ flight['long'][0]]
     df = pd.DataFrame(data=flight)
 
     fig = px.scatter_geo(df, lat='lat', lon='long', projection='orthographic'
@@ -95,7 +95,7 @@ def create_flight_map(flight: dict) -> Figure:
 
     fig.update_geos(
         visible=True, resolution=50, scope="world", showcountries=True, 
-        countrycolor=COUNTRY_LINE_COLOUR)
+        countrycolor=COUNTRY_LINE_COLOUR, projection_rotation = {'lat': midpoint[0], 'lon': midpoint[1], 'roll': 0})
     return fig
 
 def add_flight_trace(fig: Figure, data: dict):
