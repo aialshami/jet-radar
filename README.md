@@ -53,7 +53,7 @@ At JET-RADAR, our purpose is to raise awareness about the carbon emissions gener
 
 - Real-time data collection from the ADS-B Exchange API.
 - Storage of collected data in a database for historical analysis.
-- Interactive visualisations powered by Dash to explore aircraft movements and emission statistics.
+- Interactive visualisations powered by Dash to explore aircraft movements and emission statistics with a 24 hour delay.
 - Customizable filters and search options to narrow down specific private aircraft owners.
 - Integration with AWS services for a scalable and reliable architecture.
 
@@ -176,11 +176,44 @@ To install and set up JET-RADAR, follow these steps:
     python app.py
     ```
 
-    The JET-RADAR dashboard should now be accessible by opening a web browser and navigating to the provided IP address or domain name of your EC2 instance, along with the appropriate port (e.g., **http://your-ec2-ip-address:8050**).
+    The JET-RADAR dashboard should now be accessible by opening a web browser and navigating to the provided IP address or domain name of your EC2 instance, along with the appropriate port (e.g., **http://your-ec2-ip-address:8080**).
 
     Remember to configure security groups and network settings for your EC2 instance to allow inbound traffic on the required port.
 
     Please note that these instructions assume a basic familiarity with AWS EC2 instances and SSH connections. Make sure to adjust the instructions as per your specific setup and requirements.
+
+## Usage
+
+### Who Are We Tracking?
+
+JET-RADAR tracks the private jet movements of various celebrities and influential individuals. Here are the notable personalities being monitored:
+
+- Elon Musk
+- Tom Cruise
+- Oprah Winfrey
+- Floyd Mayweather
+- Taylor Swift
+- Bill Gates
+- Kim Kardashian
+- Travis Scott
+- Kylie Jenner
+- Donald Trump
+- Jim Carrey
+- John Travolta
+- Jay-Z
+- Steven Spielberg
+- Mark Wahlberg
+- A-rod
+
+By utilizing the ADS-B Exchange API and real-time data collection, JET-RADAR provides up-to-date information on the flight paths and locations of these private aircraft.
+
+### The Dashboard
+
+## ADS-B Exchange API
+
+JET-RADAR utilizes the [**ADS-B Exchange API**](https://rapidapi.com/adsbx/api/adsbexchange-com1) to collect real-time data on private aircraft movements. This comprehensive API provides information on aircraft positions, flight numbers, and more. By integrating the ADS-B Exchange API, JET-RADAR ensures accurate and up-to-date data on private jet movements. With the ADS-B Exchange API, JET-RADAR offers a reliable platform for tracking and recording unsustainable aviation practices.
+
+## The Architecture
 
 ![staging erd](https://i.ibb.co/wsC6KgH/draw-SQL-staging-export-2023-05-17.png)
 
