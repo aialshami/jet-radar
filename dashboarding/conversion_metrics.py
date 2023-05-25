@@ -48,7 +48,7 @@ def get_gender_from_id(gender_id:int, gender_df: DataFrame) -> str:
 
 def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_df:DataFrame, airport) -> dict:
     """ For a given person return the useful data of the most recent flight they've completed.
-        In progress flights will not appear until the next running of prod. Lambda.
+        In progress flights will not appear until the next running of prod. Lambda. Gives top 100.
     """
     owner_aircraft_df = pd.merge(owner, aircraft_df, on="owner_id")
     flight_merge_df = pd.merge(flight_df, owner_aircraft_df, on="tail_number")
@@ -57,7 +57,7 @@ def get_most_recent_flight_info(owner:DataFrame, flight_df: DataFrame, aircraft_
 
     fuel_df = combined_df.filter([
         "fuel_usage","lat_dep_airport","lon_dep_airport",
-        "lat_arr_airport","lon_arr_airport", "dep_time", "arr_time"]).head(5)
+        "lat_arr_airport","lon_arr_airport", "dep_time", "arr_time"]).head(100)
 
     return fuel_df.to_dict()
 

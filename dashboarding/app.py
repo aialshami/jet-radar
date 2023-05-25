@@ -3,11 +3,11 @@ import os
 from dash import Dash, html, dcc, page_container, page_registry
 from dotenv import load_dotenv
 from dash.dependencies import Input, Output, State
-from visualisation_functions import default_empty_fig, default_flight_fig, co2_of_flight_vs_average, cost_of_flight_vs_average, create_flight_map
+from visualisation_functions import default_empty_fig, default_flight_fig, number_of_flights_over_time, co2_of_flight_vs_average, cost_of_flight_vs_average, create_flight_map
 from db_connections import get_data_as_dataframe, SQLconnection
 from conversion_metrics import get_most_recent_flight_info
-from conversion_metrics import get_celeb_info, get_total_number_of_flights
-from conversion_metrics import get_flight_cost, get_flight_co2, get_flight_time
+from conversion_metrics import get_celeb_info, get_total_number_of_flights, get_flight_time
+from conversion_metrics import get_flight_cost, get_flight_co2
 from conversion_metrics import get_new_infographic_text
 import numpy as np
 
@@ -91,7 +91,7 @@ app.layout = html.Div(
                              
                              html.Div(id="infographic-box", className="container", children=[
                                  html.Div(id="hidden-hold-"),
-                                 dcc.Interval(id="refresh_infographic", interval=5*1000, n_intervals=0),
+                                 dcc.Interval(id="refresh_infographic", interval=3*1000, n_intervals=0),
                                  html.P(id='infographic-text', className="box")
                              ]),
                              html.Div(id="small-analytics-container", children=[
@@ -117,8 +117,7 @@ app.layout = html.Div(
                                                 )]
                                      ),
                             html.Div(id="flight-map-container", children=[
-                                     dcc.Graph(id="flight-map",
-                                        figure=create_flight_map(TEMP_FLIGHT))
+                                     dcc.Graph(id="flight-map")
                                  ]),
                             html.Div(id="graph-flights-over-time",children=[
                                      dcc.Graph(id="flights-vs-time-graph")
@@ -143,11 +142,14 @@ app.layout = html.Div(
      Output("co2-graph","figure"),
      Output("cost-graph","figure"),
      Output("flight-map","figure"),
+     Output("flights-vs-time-graph","figure"),
     ],
-    Input("celeb-dropdown", "value"),
+    [Input("celeb-dropdown", "value"),],
 )
 def swap_celebrity(dropdown_value:str):
     """ This is a callback for the dropdown list to pipe data into all the elements """
+    #sets them to alter the global values
+    global RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME, RECENT_DISPLAY 
     celeb_name = " ".join([x[0].upper() + x[1:] for x in dropdown_value.split('_')])
     name, gender, age, worth = get_celeb_info(celeb_name, owner_df, gender_df)
     celeb_img = f"assets/celeb_photos/{dropdown_value}.jpg"
@@ -160,11 +162,10 @@ def swap_celebrity(dropdown_value:str):
     flight_co2_string = "This flight used - "
     flight_fuel_string = "This flight used - "
     flight_time_string = "This flight took - "
-    cost_fig, co2_fig, focus_flight_fig = default_empty_fig(), default_empty_fig(), default_flight_fig()
+    RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME = 0,0,0,0
+    cost_fig, co2_fig, focus_flight_fig, weekday_fig = default_empty_fig(), default_empty_fig(), default_flight_fig(), default_empty_fig
 
     if MOST_RECENT_FLIGHTS['fuel_usage'] != {}:
-        #sets them to alter the global values
-        global RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME, RECENT_DISPLAY 
         RECENT_COST = get_flight_cost(MOST_RECENT_FLIGHTS['fuel_usage'][0])
         RECENT_CO2 =  get_flight_co2(MOST_RECENT_FLIGHTS['fuel_usage'][0])
         RECENT_FUEL = round(MOST_RECENT_FLIGHTS['fuel_usage'][0])
@@ -181,11 +182,13 @@ def swap_celebrity(dropdown_value:str):
         lat_i, lat_j = MOST_RECENT_FLIGHTS["lat_dep_airport"][0], MOST_RECENT_FLIGHTS["lat_arr_airport"][0]
         lon_i, lon_j = MOST_RECENT_FLIGHTS["lon_dep_airport"][0], MOST_RECENT_FLIGHTS["lon_arr_airport"][0]
         focus_flight_fig = create_flight_map({'Location': ['Start', 'End'], 'lat': [lat_i, lat_j], 'long': [lon_i, lon_j]})
+        weekday_fig = number_of_flights_over_time(MOST_RECENT_FLIGHTS)
+
 
 
     return "Name:"+name, "Gender: "+gender, "Age: "+age,"Worth: "+ worth, \
           celeb_img, number_of_flights_tracked, flight_cost_string, flight_co2_string, \
-            flight_fuel_string, flight_time_string, co2_fig, cost_fig, focus_flight_fig
+            flight_fuel_string, flight_time_string, co2_fig, cost_fig, focus_flight_fig, weekday_fig
 
 
 
