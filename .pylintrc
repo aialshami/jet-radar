@@ -9,6 +9,7 @@ py-version = 3.10
 disable = 
     unused-import,
     unused-argument,
+    unused-variable,
     import-error,
     too-many-locals
 
