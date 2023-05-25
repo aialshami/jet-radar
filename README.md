@@ -77,7 +77,7 @@ Before you begin, ensure that you have the following prerequisites installed:
 
 ### Installation
 
-To install and set up MUSK-JET, follow these steps:
+To install and set up JET-RADAR, follow these steps:
 
 1.  Fork the repository by clicking: <a href="https://github.com/aialshami/jet-radar/fork"><img src="https://upload.wikimedia.org/wikipedia/commons/3/38/GitHub_Fork_Button.png" height="15" alt="Python Logo"></a>
 
@@ -116,13 +116,13 @@ To install and set up MUSK-JET, follow these steps:
 8.  Clone your forked repository to your local machine:
 
     ```bash
-    git clone https://github.com/your-username/musk-jet.git
+    git clone https://github.com/your-username/JET-RADAR.git
     ```
 
 9.  Change into the dashboard directory:
 
     ```bash
-    cd musk-jet/dashboard
+    cd JET-RADAR/dashboard
     ```
 
 10. Install the required dependencies:
@@ -137,9 +137,9 @@ To install and set up MUSK-JET, follow these steps:
     python app.py
     ```
 
-    Access the MUSK-JET dashboard by opening a web browser and navigating to the provided link (e.g. **http://localhost:8080**). You should now see the dashboard and be able to interact with it locally.
+    Access the JET-RADAR dashboard by opening a web browser and navigating to the provided link (e.g. **http://localhost:8080**). You should now see the dashboard and be able to interact with it locally.
 
-    If you prefer, you can also deploy the MUSK-JET repository onto the EC2 instance built through terraform or any other hosting platform of your choice.
+    If you prefer, you can also deploy the JET-RADAR repository onto the EC2 instance built through terraform or any other hosting platform of your choice.
 
     1. Launch an EC2 instance on AWS and connect to it using SSH.
 
@@ -176,7 +176,7 @@ To install and set up MUSK-JET, follow these steps:
     python app.py
     ```
 
-    The MUSK-JET dashboard should now be accessible by opening a web browser and navigating to the provided IP address or domain name of your EC2 instance, along with the appropriate port (e.g., **http://your-ec2-ip-address:8050**).
+    The JET-RADAR dashboard should now be accessible by opening a web browser and navigating to the provided IP address or domain name of your EC2 instance, along with the appropriate port (e.g., **http://your-ec2-ip-address:8050**).
 
     Remember to configure security groups and network settings for your EC2 instance to allow inbound traffic on the required port.
 
