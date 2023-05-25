@@ -1,13 +1,10 @@
-[pylint]
-# Disable specific Pylint messages.
-disable =
-    unused-import,
-    unused-argument,
-    import-error,
-    too-many-locals
+[MAIN]
+# Speicfy configuration
+rcfile = .pylintrc
+py-version = 3.10
 
 
-[pylint.messages_control]
+[MESSAGES CONTROL]
 # Disable specific Pylint messages for the messages control.
 disable = 
     unused-import,
@@ -16,11 +13,12 @@ disable =
     too-many-locals
 
 
-[pylint.format]
-#Set the maximum line length to 120 characters.
-max-line-length = 120
+[FORMAT]
+#Set the maximum line length to 150 characters.
+max-line-length = 150
 
 
+[BASIC]
 # Additional configurations.
 suggestion-mode = yes
 fail-under = 8.5
