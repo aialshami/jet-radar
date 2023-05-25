@@ -5,13 +5,10 @@ from dotenv import load_dotenv
 from dash.dependencies import Input, Output, State
 from visualisation_functions import default_empty_fig, co2_of_flight_vs_average, cost_of_flight_vs_average, number_of_flights_over_time, create_flight_map
 from db_connections import get_data_as_dataframe, SQLconnection
-from conversion_metrics import get_age_from_birthdate, get_most_recent_flight_info
+from conversion_metrics import get_most_recent_flight_info
 from conversion_metrics import get_celeb_info, get_total_number_of_flights
 from conversion_metrics import get_flight_cost, get_flight_co2, get_flight_time
-from conversion_metrics import manage_names_with_dashes, get_new_infographic_text
-
 from conversion_metrics import get_new_infographic_text
-
 import numpy as np
 
 
@@ -166,7 +163,8 @@ def swap_celebrity(dropdown_value:str):
     cost_fig, co2_fig = default_empty_fig(), default_empty_fig()
 
     if MOST_RECENT_FLIGHTS['fuel_usage'] != {}:
-        global RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME
+        #sets them to alter the global values
+        global RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME, RECENT_DISPLAY 
         RECENT_COST = get_flight_cost(MOST_RECENT_FLIGHTS['fuel_usage'][0])
         RECENT_CO2 =  get_flight_co2(MOST_RECENT_FLIGHTS['fuel_usage'][0])
         RECENT_FUEL = round(MOST_RECENT_FLIGHTS['fuel_usage'][0])
@@ -193,7 +191,7 @@ def swap_celebrity(dropdown_value:str):
 def swap_infographic(n_intervals) -> str:
     """ Swaps the infographic image every 5 seconds between CO2, cost, fuel volume, and time """
     comparison_choice = np.random.choice(["co2", "cost", "fuel", "time"])
-    print(f"Recent cost is {RECENT_COST}")
+
     if comparison_choice == "co2":
         return get_new_infographic_text('co2', RECENT_CO2)
     elif comparison_choice == "cost":

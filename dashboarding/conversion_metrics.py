@@ -162,3 +162,5 @@ def compare_time(amount:float) -> tuple[int, str, str]:
     random_comp = np.random.choice(list(COMPARISONS["time"].keys()))
     comp_value = COMPARISONS["time"][random_comp]
     return round(amount/comp_value,1), random_comp, UNICODE[random_comp]
+
+
