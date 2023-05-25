@@ -49,7 +49,7 @@ def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     flight_co2 = flight_data["co2"]
 
     fig = px.bar(x=[avg_co2, flight_co2], y= ['Avg', celeb_name]
-                 ).update_layout(xaxis_title="Flight CO2 vs Avg Yearly CO2 for 1000 people", yaxis_visible=False,
+                 ).update_layout(xaxis_title="Flight CO2 vs Avg Yr CO2 per 1000 people", yaxis_visible=False,
                                 margin=dict(l=20, r=20, t=20, b=20), plot_bgcolor='#252e3f')
     return fig
 
@@ -61,16 +61,16 @@ def cost_of_flight_vs_average(flight_data:dict, avg_wage:float) -> Figure:
     wage_cost = flight_data["time"] * avg_wage
 
     fig = px.bar(x=[wage_cost, flight_cost], y= ['Avg', celeb_name]
-                 ).update_layout(xaxis_title="100 Median Wages over flight time vs Flight cost", yaxis_visible=False,
+                 ).update_layout(xaxis_title="100 Median Wages (during flight) vs Flight cost", yaxis_visible=False,
                                 margin=dict(l=20, r=20, t=20, b=20),plot_bgcolor='#252e3f')
     return fig
 
-def number_of_flights_over_time() -> Figure:
+def number_of_flights_over_time(flights: dict) -> Figure:
     """ Produces figure showing number of flights over last 6 mnths """
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
     flights = [1, 3, 2, 5, 6, 4]
     fig = px.bar(x=months, y=flights).update_layout(
-                            xaxis_title="Flights over 6 mnths",
+                            xaxis_title="Flight distribution throughout the months",
                             yaxis_title="No. of flights",
                             margin=dict(l=20, r=20, t=20, b=20),plot_bgcolor='#252e3f')
     return fig
