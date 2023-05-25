@@ -34,14 +34,10 @@ MEDIAN_HR_WAGE = 11.01*100 # Median hrly wage for 100 Americans https://www.stat
 AVG_YEARLY_CO2_IMPACT = 4 # mtCO2: GLOBAL AVG YEARLY CO2 of 4tons * 1000 people
 
 TEMP_FLIGHT = {'Location': ['Start', 'End'], 'lat': [30, 40], 'long': [-90, -80]}
-DEFAULT_NAME="Elon Musk"
-DEFAULT_GENDER="Male"
-DEFAULT_AGE = 51
-DEFAULT_WORTH="180000 M"
 
 PREVIOUS_INFOGRAPHIC = "time" # sets a default to work from
 PAST_FLIGHTS = [1, 2, 3, 4, 5]
-MOST_RECENT_FLIGHTS= get_most_recent_flight_info(owner_df[owner_df["name"] == DEFAULT_NAME], flight_df, aircraft_df, airport_df)
+MOST_RECENT_FLIGHTS= get_most_recent_flight_info(owner_df[owner_df["name"] == "Elon Musk"], flight_df, aircraft_df, airport_df)
 
 RECENT_FUEL = round(MOST_RECENT_FLIGHTS['fuel_usage'][0])
 RECENT_CO2 = get_flight_co2(RECENT_FUEL)
@@ -163,7 +159,7 @@ def swap_celebrity(dropdown_value:str):
     flight_fuel_string = "This flight used - "
     flight_time_string = "This flight took - "
     RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME = 0,0,0,0
-    cost_fig, co2_fig, focus_flight_fig, weekday_fig = default_empty_fig(), default_empty_fig(), default_flight_fig(), default_empty_fig
+    cost_fig, co2_fig, focus_flight_fig, weekday_fig = default_empty_fig(), default_empty_fig(), default_flight_fig(), default_empty_fig()
 
     if MOST_RECENT_FLIGHTS['fuel_usage'] != {}:
         RECENT_COST = get_flight_cost(MOST_RECENT_FLIGHTS['fuel_usage'][0])
