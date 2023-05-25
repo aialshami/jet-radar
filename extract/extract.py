@@ -1,9 +1,12 @@
 """ This module runs the extraction process for the celebrity plane current flight data """
-import os, json, requests, boto3
+from datetime import datetime
+import os
+import json
+import requests
+import boto3
 import pandas as pd
 
 from pandas import DataFrame
-from datetime import datetime
 from dotenv import load_dotenv
 from db_connection import push_to_staging_database
 
@@ -62,7 +65,7 @@ def get_flight_params(flight: dict) -> list:
 
     flight_info = flight["ac"][0]
     flight_data["time_input"] = datetime.utcfromtimestamp(flight["now"]/1000)
-    
+
     for key in flight_info.keys():
         if key == "flight":
             flight_data["flight_no"] = flight_info["flight"]
@@ -105,3 +108,7 @@ def handler(event, context) -> None:
     if not flight_df.empty:
         push_to_staging_database(config, flight_df)
         return flight_df.to_json()
+
+    
+if __name__ == "__main__":
+    handler()
