@@ -36,7 +36,7 @@ AVG_YEARLY_CO2_IMPACT = 4 # mtCO2: GLOBAL AVG YEARLY CO2 of 4tons * 1000 people
 PREVIOUS_INFOGRAPHIC = "time" # sets a default to work from
 PAST_FLIGHTS = [1, 2, 3, 4, 5]
 MOST_RECENT_FLIGHTS= get_most_recent_flight_info(owner_df[owner_df["name"] == "Elon Musk"], flight_df, aircraft_df, airport_df)
-
+RECENT_CO2, RECENT_COST, RECENT_FUEL, RECENT_TIME = 0,0,0,0
 RECENT_DISPLAY, RECENT_TIME = get_flight_time(MOST_RECENT_FLIGHTS['dep_time'][0],MOST_RECENT_FLIGHTS['arr_time'][0])
 
 # HTML document
@@ -173,9 +173,9 @@ def swap_celebrity(dropdown_value:str):
         lat_i, lat_j = MOST_RECENT_FLIGHTS["lat_dep_airport"][0], MOST_RECENT_FLIGHTS["lat_arr_airport"][0]
         lon_i, lon_j = MOST_RECENT_FLIGHTS["lon_dep_airport"][0], MOST_RECENT_FLIGHTS["lon_arr_airport"][0]
         focus_flight_fig = create_flight_map({'Location': ['Start', 'End'], 'lat': [lat_i, lat_j], 'long': [lon_i, lon_j]})
+        print('here')
         weekday_fig = number_of_flights_over_time(MOST_RECENT_FLIGHTS)
-
-
+        print('after')
 
     return "Name:"+name, "Gender: "+gender, "Age: "+age,"Worth: "+ worth, \
           celeb_img, number_of_flights_tracked, flight_cost_string, flight_co2_string, \

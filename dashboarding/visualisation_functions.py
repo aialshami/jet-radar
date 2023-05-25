@@ -38,9 +38,9 @@ def default_flight_fig() -> Figure:
 
 def number_of_flights_over_time(flights:dict) -> Figure:
     list_of_days = []
-    print(flights)
+    print("anything")
 
-    return default_empty_fig()
+    return px.bar(x=[1,2], y=[3,4])
 
 def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     """ Produces figure contrasting the co2 output of 
@@ -65,15 +65,6 @@ def cost_of_flight_vs_average(flight_data:dict, avg_wage:float) -> Figure:
                                 margin=dict(l=20, r=20, t=20, b=20),plot_bgcolor='#252e3f')
     return fig
 
-def number_of_flights_over_time(flights: dict) -> Figure:
-    """ Produces figure showing number of flights over last 6 mnths """
-    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
-    flights = [1, 3, 2, 5, 6, 4]
-    fig = px.bar(x=months, y=flights).update_layout(
-                            xaxis_title="Flight distribution throughout the months",
-                            yaxis_title="No. of flights",
-                            margin=dict(l=20, r=20, t=20, b=20),plot_bgcolor='#252e3f')
-    return fig
 
 def create_flight_map(flight: dict) -> Figure:
     """ Uses lat/lon of departure/arrival airports to plot a flight path of a celeb """
