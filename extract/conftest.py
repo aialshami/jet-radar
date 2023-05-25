@@ -1,7 +1,7 @@
 """Conftest file for extract module tests."""
-import pytest
 import os
 import json
+import pytest
 
 
 def clean_airport_data(airport_info: list[dict]) -> dict[dict]:
@@ -19,20 +19,23 @@ def load_json_from_data_directory(file_name: str) -> dict | list:
     current_dir = os.path.dirname(__file__)
     file_path = os.path.join(current_dir, f"../data/{file_name}")
 
-    with open(file_path, encoding="utf-8") as f:
-        return json.load(f)
+    with open(file_path, encoding="utf-8") as file:
+        return json.load(file)
 
 
 @pytest.fixture
-def airport_data():
+def airport_data() -> dict[dict]:
+    """Returns airports data as a dict of dicts."""
     return clean_airport_data(load_json_from_data_directory("airports.json"))
 
 
 @pytest.fixture
-def aircraft_data():
+def aircraft_data() -> dict[dict]:
+    """Returns aircraft data as dict of dicts."""
     return load_json_from_data_directory("aircraft_fuel_consumption_rates.json")
 
 
 @pytest.fixture
-def celeb_planes_data():
+def celeb_planes_data() -> list[dict]:
+    """Returns celeb planes data as a list of dictionaries."""
     return load_json_from_data_directory("celeb_planes.json")

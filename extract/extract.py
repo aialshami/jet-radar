@@ -33,7 +33,7 @@ def get_current_flight_for_icao(icao_number: str) -> json:
         "X-RapidAPI-Key": config["RAPIDAPI_KEY"],
         "X-RapidAPI-Host": config["RAPIDAPI_HOST"]
     }
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=10)
     return response.json()
 
 

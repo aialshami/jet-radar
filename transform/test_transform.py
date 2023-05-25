@@ -1,7 +1,6 @@
 """Tests for transform module and it's utility functions."""
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
-from psycopg2.extensions import connection
 from psycopg2.extras import RealDictCursor
 import pandas as pd
 

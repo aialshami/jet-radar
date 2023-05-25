@@ -17,10 +17,12 @@ def load_json_from_data_directory(file_name: str) -> dict | list:
 
 
 @pytest.fixture
-def airport_data():
+def airport_data() -> dict[dict]:
+    """Returns airport data as dict of dicts."""
     return clean_airport_data(load_json_from_data_directory("airports.json"))
 
 
 @pytest.fixture
-def aircraft_data():
+def aircraft_data() -> dict[dict]:
+    """Returns aircraft data as dict of dicts"""
     return load_json_from_data_directory("aircraft_fuel_consumption_rates.json")
