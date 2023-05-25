@@ -87,7 +87,7 @@ def get_celeb_info(name: str, owner_df:DataFrame, gender_df:DataFrame) -> list[s
     age = str(get_age_from_birthdate(owner_record["birthdate"].values[0]))
     worth = str(round(owner_record["est_net_worth"].values[0]/10**6)) + " M"
 
-    return ["Name: " + name, "Gender: " + gender, "Age: " + age, "Worth: " + worth]
+    return [name, gender, age, worth]
 
 def get_flight_cost(gallons:float) -> float:
     """ Gives the cost of the flight in dollars """
@@ -102,7 +102,10 @@ def get_flight_time(departure, arrival) -> str:
     num_hrs = floor((arrival.to_pydatetime() - departure.to_pydatetime()).seconds/(3600))
     num_mins = int((arrival.to_pydatetime() - departure.to_pydatetime()).seconds/(60)) - num_hrs*60
     
-    return f"{num_hrs} hrs, {num_mins} mins"
+    return f"{num_hrs} hrs, {num_mins} mins", (arrival.to_pydatetime() - departure.to_pydatetime()).seconds/3600
+
+
+
 
 def get_total_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataFrame, flight_df:DataFrame) -> str:
     """ Gets the total number of flights we've tracked for celeb w/ given name """
@@ -114,9 +117,11 @@ def get_total_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataF
     return "# of flights tracked is: " + str(len(relevant_flights))
 
 
-def get_new_infographic_text(previous: str):
-    """ Changes the infographic text to the next visualisation emoji prompt """
 
-    return f"previous was {previous} & next is CO2"
+
+def get_new_infographic_text(comparison: str, value:float) -> str:
+    """ Changes the infographic text to the next visualisation emoji prompt """
+    if comparison == "co2":
+        return value
 
 
