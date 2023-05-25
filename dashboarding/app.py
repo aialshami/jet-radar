@@ -173,9 +173,7 @@ def swap_celebrity(dropdown_value:str):
         lat_i, lat_j = MOST_RECENT_FLIGHTS["lat_dep_airport"][0], MOST_RECENT_FLIGHTS["lat_arr_airport"][0]
         lon_i, lon_j = MOST_RECENT_FLIGHTS["lon_dep_airport"][0], MOST_RECENT_FLIGHTS["lon_arr_airport"][0]
         focus_flight_fig = create_flight_map({'Location': ['Start', 'End'], 'lat': [lat_i, lat_j], 'long': [lon_i, lon_j]})
-        print('here')
         weekday_fig = number_of_flights_over_time(MOST_RECENT_FLIGHTS)
-        print('after')
 
     return "Name:"+name, "Gender: "+gender, "Age: "+age,"Worth: "+ worth, \
           celeb_img, number_of_flights_tracked, flight_cost_string, flight_co2_string, \

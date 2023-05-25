@@ -3,9 +3,12 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import requests
-from pandas import DataFrame
+from pandas import DataFrame, Series
+from datetime import datetime
 from plotly.graph_objs._figure import Figure
 
+
+WEEKDAYS={0:"Mon", 1:"Tu", 2:"Wed", 3:"Thu", 4:"Fri", 5:"Sat", 6:"Sun"}
 
 COUNTRY_LINE_COLOUR="#2cfec1"
 FLIGHT_LINE_COLOUR = '#9467bd'
@@ -36,11 +39,23 @@ def default_flight_fig() -> Figure:
         countrycolor=COUNTRY_LINE_COLOUR)
     return fig
 
-def number_of_flights_over_time(flights:dict) -> Figure:
-    list_of_days = []
-    print("anything")
+def number_of_flights_over_time(flights: dict[dict]) -> Figure:
+    """ Creates a graph of which days the fly on the most """
+    if flights["fuel_usage"] == {}:
+        return default_empty_fig()
 
-    return px.bar(x=[1,2], y=[3,4])
+    list_of_days = []
+    
+    flight_data = pd.DataFrame.from_dict(flights) 
+    flight_data = flight_data.drop_duplicates()
+    flight_data["day"] = pd.to_datetime(flight_data['dep_time']).apply(lambda x: WEEKDAYS[x.weekday()])
+
+    flight_data = flight_data.groupby('day').count().reset_index()
+    
+    fig = px.bar(flight_data, x='day').update_layout(xaxis_title="Day of Week",yaxis_title="Number of Flights",
+                                margin=dict(l=20, r=20, t=20, b=20), plot_bgcolor='#252e3f')
+
+    return fig
 
 def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     """ Produces figure contrasting the co2 output of 
@@ -49,8 +64,9 @@ def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     flight_co2 = flight_data["co2"]
 
     fig = px.bar(x=[avg_co2, flight_co2], y= ['Avg', celeb_name]
-                 ).update_layout(xaxis_title="Flight CO2 vs Avg Yr CO2 per 1000 people", yaxis_visible=False,
-                                margin=dict(l=20, r=20, t=20, b=20), plot_bgcolor='#252e3f')
+                 ).update_layout(xaxis_title="Flight CO2 vs Avg Yr CO2 per 1000 people", 
+                                 yaxis_visible=False, margin=dict(l=20, r=20, t=20, b=20), 
+                                 plot_bgcolor='#252e3f')
     return fig
 
 def cost_of_flight_vs_average(flight_data:dict, avg_wage:float) -> Figure:
