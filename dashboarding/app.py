@@ -87,7 +87,7 @@ app.layout = html.Div(
                              
                              html.Div(id="infographic-box", className="container", children=[
                                  html.Div(id="hidden-hold-"),
-                                 dcc.Interval(id="refresh_infographic", interval=3*1000, n_intervals=0),
+                                 dcc.Interval(id="refresh_infographic", interval=5*1000, n_intervals=0),
                                  html.P(id='infographic-text', className="box")
                              ]),
                              html.Div(id="small-analytics-container", children=[
