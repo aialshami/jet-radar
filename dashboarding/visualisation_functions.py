@@ -64,7 +64,7 @@ def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
     flight_co2 = flight_data["co2"]
 
     fig = px.bar(x=[avg_co2, flight_co2], y= ['Avg', celeb_name]
-                 ).update_layout(xaxis_title="Flight CO2 vs Avg Yr CO2 per 1000 people", 
+                 ).update_layout(xaxis_title="CO2 vs Avg Yr CO2 per 1000 people", 
                                  yaxis_visible=False, margin=dict(l=20, r=20, t=20, b=20), 
                                  plot_bgcolor='#252e3f')
     return fig
@@ -77,7 +77,7 @@ def cost_of_flight_vs_average(flight_data:dict, avg_wage:float) -> Figure:
     wage_cost = flight_data["time"] * avg_wage
 
     fig = px.bar(x=[wage_cost, flight_cost], y= ['Avg', celeb_name]
-                 ).update_layout(xaxis_title="100 Median Wages (during flight) vs Flight cost", yaxis_visible=False,
+                 ).update_layout(xaxis_title="100 Median Wages (during flight) vs Cost", yaxis_visible=False,
                                 margin=dict(l=20, r=20, t=20, b=20),plot_bgcolor='#252e3f')
     return fig
 
