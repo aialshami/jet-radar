@@ -17,6 +17,7 @@ def get_celeb_json() -> dict:
     s3_bucket = boto3.resource('s3')
 
     obj = s3_bucket.Object(config["S3_BUCKET_NAME"], config["CELEB_INFO"])
+
     celeb_json = json.load(obj.get()['Body'])
     return celeb_json
 
@@ -49,7 +50,7 @@ def convert_flight_list_to_df(flights:list[dict]) -> DataFrame:
 
     flight_list = []
     for flight in flights:
-        # #i.e if plane is in the air, add flight details in appropriate format
+        # i.e if plane is in the air, add flight details in appropriate format
         if flight["ac"] != []:
             flight_list.append(get_flight_params(flight))
     return pd.DataFrame(flight_list)

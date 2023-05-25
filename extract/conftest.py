@@ -1,8 +1,15 @@
+"""Conftest file for extract module tests."""
 import pytest
 import os
 import json
 
-from utilities import clean_airport_data
+
+def clean_airport_data(airport_info: list[dict]) -> dict[dict]:
+    """Removes airports that don't have latitude, longitude and iata information. Expects a list of dicts
+    and returns the filtered list."""
+
+    return {airport["iata"]: airport for airport in airport_info
+            if "lat" in airport and "lon" in airport and "iata" in airport}
 
 
 def load_json_from_data_directory(file_name: str) -> dict | list:
@@ -24,3 +31,8 @@ def airport_data():
 @pytest.fixture
 def aircraft_data():
     return load_json_from_data_directory("aircraft_fuel_consumption_rates.json")
+
+
+@pytest.fixture
+def celeb_planes_data():
+    return load_json_from_data_directory("celeb_planes.json")
