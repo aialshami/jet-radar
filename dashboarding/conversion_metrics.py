@@ -114,18 +114,15 @@ def get_total_number_of_flights(name:str, owner_df:DataFrame, aircraft_df: DataF
 def get_new_infographic_text(comparison: str, value:float) -> str:
     """ Changes the infographic text to the next visualisation emoji prompt """
     if comparison == "co2":
-        quantity, item, emoji = compare_co2(value)
-        return f"This flight is equivalent to {quantity} {item}s of CO2 {emoji}"
+        return compare_co2(value)
     elif comparison == "cost":
-        quantity, item, emoji = compare_cost(value)
-        return f"This flight is equivalent to the cost of {quantity} {item}s {emoji}"
+        return compare_cost(value)
     elif comparison == "fuel":
-        quantity, item, emoji = compare_fuel(value)
-        return f"This flight is equivalent to the fuel of {quantity} {item}s {emoji}"
+       return compare_fuel(value)
     elif comparison == "time":
-        quantity, item, emoji = compare_time(value)
-        return f"This flight is equivalent to the time of {quantity} {item}s {emoji}"
-
+        return compare_time(value)
+    
+    raise ValueError("Should be one of ['co2', 'cost', 'fuel', 'time']")
 
 UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9", 
            "tree": "\U0001F333", "football": "\U000026BD", "album":"\U0001F3B5", 
@@ -133,34 +130,52 @@ UNICODE = {"cow": "\U0001F42E", "car": "\U0001F697", "plane": "\U0001F6E9",
            "shopping": "\U0001F6D2", "tea":"\U00002615", "beer": "\U0001F37A"}
 
 # CO2 is yrly, cost is avg per item, fuel is in gal, time in hrs
-COMPARISONS = {"co2": {"tree": 0.167, "cow": 2.5, "car": 2.58},
-               "cost": {"phone": 208, "sweets": 1.88, "shopping": 106.64},
-               "fuel": {"tea": 0.0264172, "beer": 0.01501},
-               "time": {"film": 1.68, "album": 0.73, "football": 1.5}}
+COMPARISONS = {"co2": {"tree": [0.167, f"This flight used the same CO2 stored by __ trees (yearly)"], 
+                       "cow": [2.5, f"This flight produced emissions equal to __ cows (yearly) "],  
+                       "car": [2.58, f"This flight's CO2 was __ people's yearly commute (USA) "]},
+
+               "cost": {"phone": [208, f"This flight cost roughly __ of the avg US phone "], 
+                        "sweets": [1.88, f"Instead of flying, you could've got __ chocolate bars "], 
+                        "shopping": [106.64, f"This flight could've bought __ people's weekly shops "]},
+               
+               "fuel": {"tea": [0.0264172, f"The amount of fuel is equal to __ cups of tea "], 
+                        "beer": [0.01501, f"The volume of fuel is roughly __ pints of beer "], },
+               
+               "time": {"film": [1.68, f"This flight's duration equals about __ movies "],
+                        "album": [0.73, f"Instead you could've heard Taylor Swift's 'Midnights' __ times "], 
+                        "football": [1.5, f"This flight took as long as __ football matches "]}}
 
 
 def compare_co2(amount:float) -> tuple[int, str, str]:
     """ Gets a random comparison for the mtCO2 of the flight """
     random_comp = np.random.choice(list(COMPARISONS["co2"].keys()))
-    comp_value = COMPARISONS["co2"][random_comp]
-    return round(amount/comp_value,1), random_comp, UNICODE[random_comp]
+    comp_value = COMPARISONS["co2"][random_comp][0]
+    comparison_sentence = COMPARISONS["co2"][random_comp][1]
+
+    return comparison_sentence.replace("__", str(round(amount/comp_value,1))) + UNICODE[random_comp]
 
 def compare_cost(amount:float) -> tuple[int, str, str]:
     """ Gets a random comparison for the mtCO2 of the flight """
     random_comp = np.random.choice(list(COMPARISONS["cost"].keys()))
-    comp_value = COMPARISONS["cost"][random_comp]
-    return round(amount/comp_value,1), random_comp, UNICODE[random_comp]
+    comp_value = COMPARISONS["cost"][random_comp][0]
+    comparison_sentence = COMPARISONS["cost"][random_comp][1]
+
+    return comparison_sentence.replace("__", str(round(amount/comp_value,1))) + UNICODE[random_comp]
 
 def compare_fuel(amount:float) -> tuple[int, str, str]:
     """ Gets a random comparison for the mtCO2 of the flight """
     random_comp = np.random.choice(list(COMPARISONS["fuel"].keys()))
-    comp_value = COMPARISONS["fuel"][random_comp]
-    return round(amount/comp_value, 1), random_comp, UNICODE[random_comp]
+    comp_value = COMPARISONS["fuel"][random_comp][0]
+    comparison_sentence = COMPARISONS["fuel"][random_comp][1]
+
+    return comparison_sentence.replace("__", str(round(amount/comp_value,1))) + UNICODE[random_comp]
 
 def compare_time(amount:float) -> tuple[int, str, str]:
     """ Gets a random comparison for the mtCO2 of the flight """
     random_comp = np.random.choice(list(COMPARISONS["time"].keys()))
-    comp_value = COMPARISONS["time"][random_comp]
-    return round(amount/comp_value,1), random_comp, UNICODE[random_comp]
+    comp_value = COMPARISONS["time"][random_comp][0]
+    comparison_sentence = COMPARISONS["time"][random_comp][1]
+
+    return comparison_sentence.replace("__", str(round(amount/comp_value,1))) + UNICODE[random_comp]
 
 
