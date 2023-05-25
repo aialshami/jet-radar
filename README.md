@@ -1,6 +1,4 @@
-![jet banner](https://aircharterservice-globalcontent-live.cphostaccess.com/images/blog-images/private_jet_in_the_sun_banner_tcm36-53924.jpg)
-
-<img src="https://i.ibb.co/Bn2MDT8/JET-RADAR-1-4.png" height=300 alt="jet-radar logo">
+![jet banner](https://i.ibb.co/R0YkPvk/private-jet-in-the-sun-banner-tcm36-53924-overlay.png)
 
 <!-- TABLE OF CONTENTS -->
 <details>
