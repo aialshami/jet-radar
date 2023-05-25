@@ -84,7 +84,7 @@ def extract_todays_flights(conn: connection) -> list[tuple]:
             parsed_flights.append((jet, flight_no, dep_time, dep_location, arr_time, arr_location, emergency))
             curs.execute("DELETE FROM tracked_event WHERE aircraft_reg = %s AND flight_no = %s",
                         (jet, flight_no))
-            
+
     curs.close()
     return parsed_flights
 
@@ -325,3 +325,7 @@ def handler(event = None, context = None) -> None:
     # Close the db connections
     production_conn.close()
     staging_conn.close()
+
+    
+if __name__ == "__main__":
+    handler()
