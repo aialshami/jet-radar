@@ -65,13 +65,16 @@ To view our live Dashboard please click on the image below 👇:
 
 [![airplane door](https://twistedsifter.com/wp-content/uploads/2022/01/Screen-Shot-2022-01-06-at-8.33.44-AM.png?w=1024)](https://www.youtube.com/watch?v=xvFZjo5PgG0)
 
-Want to launch your own MUSK-JET data collection and visualisation system? Or do you want to contribute to the project? Follow the guidelines in the next sections 👇:
+Want to launch your own MUSK-JET data collection and visualisation system? Or do you want to contribute to the project? Follow the guidelines in the next sections to get started👇:
 
 ### Prerequisites
 
 Before you begin, ensure that you have the following prerequisites installed:
 
-- Python (version 3.6 or above) <a href="https://www.python.org/downloads/"><img src="https://www.python.org/static/community_logos/python-logo-generic.svg" height="20" alt="Python Logo"></a> <-- click to download
+- Terraform (version 1.2.0 or above) <a href="https://www.terraform.io/downloads.html"><img src="https://blogs.vmware.com/cloudprovider/files/2019/04/og-image-8b3e4f7d-blog-aspect-ratio.png" height="20" alt="Python Logo"></a> <-- click to download
+
+- Python (version 3.10 or above) <a href="https://www.python.org/downloads/"><img src="https://www.python.org/static/community_logos/python-logo-generic.svg" height="20" alt="Python Logo"></a> <-- click to download
+
 - Pip (a package installer for Python)
 
 ### Installation
@@ -81,7 +84,7 @@ To install and set up MUSK-JET, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/aialshami/musk-jet.git
+   git fork https://github.com/aialshami/musk-jet.git
    ```
 
    ```bash
@@ -89,5 +92,9 @@ To install and set up MUSK-JET, follow these steps:
    ```
 
    ```bash
-
+    cd
    ```
+
+   add environment variables to github
+   run deploy action
+   cd into
