@@ -93,7 +93,7 @@ def get_flight_params(flight: dict) -> list:
     return flight_data
 
 
-def handler(event, context) -> None:
+def handler(event=None, context=None) -> None:
     """ The handler function to execute the extraction process """
     # Pulls celeb info from S3
     celeb_json = get_celeb_json()
