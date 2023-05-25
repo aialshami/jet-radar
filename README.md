@@ -1,6 +1,6 @@
 ![jet banner](https://aircharterservice-globalcontent-live.cphostaccess.com/images/blog-images/private_jet_in_the_sun_banner_tcm36-53924.jpg)
 
-# JET-RADAR ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️ ✈️
+<img src="https://i.ibb.co/Bn2MDT8/JET-RADAR-1-4.png" height=300 alt="jet-radar logo">
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -55,7 +55,7 @@ At JET-RADAR, our purpose is to raise awareness about the carbon emissions gener
 
 - Real-time data collection from the ADS-B Exchange API.
 - Storage of collected data in a database for historical analysis.
-- Interactive visualizations powered by Dash to explore aircraft movements and emission statistics.
+- Interactive visualisations powered by Dash to explore aircraft movements and emission statistics.
 - Customizable filters and search options to narrow down specific private aircraft owners.
 - Integration with AWS services for a scalable and reliable architecture.
 
@@ -71,9 +71,9 @@ Want to launch your own JET-RADAR data collection and visualisation system? Or d
 
 Before you begin, ensure that you have the following prerequisites installed:
 
-- Terraform (version 1.2.0 or above) <a href="https://www.terraform.io/downloads.html"><img src="https://blogs.vmware.com/cloudprovider/files/2019/04/og-image-8b3e4f7d-blog-aspect-ratio.png" height="20" alt="Python Logo"></a> <-- click to download
+- <a href="https://www.terraform.io/downloads.html"><img src="https://www.svgrepo.com/show/354447/terraform-icon.svg" height="20" alt="Terraform Logo"></a> Terraform (version 1.2.0 or above)
 
-- Python (version 3.10 or above) <a href="https://www.python.org/downloads/"><img src="https://www.python.org/static/community_logos/python-logo-generic.svg" height="20" alt="Python Logo"></a> <-- click to download
+- <a href="https://www.python.org/downloads/"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" height="20" alt="Python Logo"></a> Python (version 3.10 or above)
 
 - Pip (a package installer for Python)
 
