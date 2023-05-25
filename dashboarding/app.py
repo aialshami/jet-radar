@@ -46,6 +46,10 @@ PREVIOUS_INFOGRAPHIC = "time" # sets a default to work from
 PAST_FLIGHTS = [1, 2, 3, 4, 5]
 MOST_RECENT_FLIGHTS= get_most_recent_flight_info(owner_df[owner_df["name"] == DEFAULT_NAME], flight_df, aircraft_df, airport_df)
 
+RECENT_FUEL = round(MOST_RECENT_FLIGHTS['fuel_usage'][0])
+RECENT_CO2 = get_flight_co2(RECENT_FUEL)
+RECENT_COST = get_flight_cost(RECENT_FUEL)
+RECENT_DISPLAY, RECENT_TIME = get_flight_time(MOST_RECENT_FLIGHTS['dep_time'][0],MOST_RECENT_FLIGHTS['arr_time'][0])
 
 # HTML document
 app.layout = html.Div(
@@ -89,6 +93,7 @@ app.layout = html.Div(
                                     ]),
                              
                              html.Div(id="infographic-box", className="container", children=[
+                                 html.Div(id="hidden-hold-"),
                                  dcc.Interval(id="refresh_infographic", interval=5*1000, n_intervals=0),
                                  html.P(id='infographic-text', className="box")
                              ]),
@@ -158,24 +163,24 @@ def swap_celebrity(dropdown_value:str):
     flight_co2_string = "This flight used - "
     flight_fuel_string = "This flight used - "
     flight_time_string = "This flight took - "
-    cost,co2,fuel = 0,0,0
     cost_fig, co2_fig = default_empty_fig(), default_empty_fig()
 
     if MOST_RECENT_FLIGHTS['fuel_usage'] != {}:
-        cost = get_flight_cost(MOST_RECENT_FLIGHTS['fuel_usage'][0])
-        co2 =  get_flight_co2(MOST_RECENT_FLIGHTS['fuel_usage'][0])
-        fuel = round(MOST_RECENT_FLIGHTS['fuel_usage'][0])
-        display_t, time = get_flight_time(MOST_RECENT_FLIGHTS['dep_time'][0],MOST_RECENT_FLIGHTS['arr_time'][0])
+        global RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME
+        RECENT_COST = get_flight_cost(MOST_RECENT_FLIGHTS['fuel_usage'][0])
+        RECENT_CO2 =  get_flight_co2(MOST_RECENT_FLIGHTS['fuel_usage'][0])
+        RECENT_FUEL = round(MOST_RECENT_FLIGHTS['fuel_usage'][0])
+        RECENT_DISPLAY, RECENT_TIME = get_flight_time(MOST_RECENT_FLIGHTS['dep_time'][0],MOST_RECENT_FLIGHTS['arr_time'][0])
 
-        flight_cost_string += f"${cost}"
-        flight_co2_string += f"{co2} mtCO2"
-        flight_fuel_string +=f"{fuel} gal of fuel"
-        flight_time_string += f"{display_t}"
-        cost_fig = cost_of_flight_vs_average({"owner": name, "cost": cost, "time":time}, MEDIAN_HR_WAGE)
-        co2_fig = co2_of_flight_vs_average({"owner": name, "co2": co2}, AVG_YEARLY_CO2_IMPACT)
+        flight_cost_string += f"${RECENT_COST}"
+        flight_co2_string += f"{RECENT_CO2} mtCO2"
+        flight_fuel_string +=f"{RECENT_FUEL} gal of fuel"
+        flight_time_string += f"{RECENT_DISPLAY}"
+        cost_fig = cost_of_flight_vs_average({"owner": name, "cost": RECENT_COST, "time":RECENT_TIME}, MEDIAN_HR_WAGE)
+        co2_fig = co2_of_flight_vs_average({"owner": name, "co2": RECENT_CO2}, AVG_YEARLY_CO2_IMPACT)
 
 
-    return "Name:" + name, "Gender: "+gender, "Age: "+age,"Worth: "+ worth, \
+    return "Name:"+name, "Gender: "+gender, "Age: "+age,"Worth: "+ worth, \
           celeb_img, number_of_flights_tracked, flight_cost_string, flight_co2_string, \
             flight_fuel_string, flight_time_string, co2_fig, cost_fig
 
@@ -188,15 +193,15 @@ def swap_celebrity(dropdown_value:str):
 def swap_infographic(n_intervals) -> str:
     """ Swaps the infographic image every 5 seconds between CO2, cost, fuel volume, and time """
     comparison_choice = np.random.choice(["co2", "cost", "fuel", "time"])
-    
+    print(f"Recent cost is {RECENT_COST}")
     if comparison_choice == "co2":
-        return f"This flights CO2 is the same as {get_new_infographic_text('co2', 100)} "
+        return get_new_infographic_text('co2', RECENT_CO2)
     elif comparison_choice == "cost":
-        return ""
+        return get_new_infographic_text('cost', RECENT_COST)
     elif comparison_choice == "fuel":
-        return ""
+        return get_new_infographic_text('fuel', RECENT_FUEL)
     elif comparison_choice == "time":
-        return ""
+        return get_new_infographic_text('time', RECENT_TIME)
     else:
         raise ValueError("comparison_choice should only ever be one of ['time', 'fuel', 'co2', 'cost']")
 
