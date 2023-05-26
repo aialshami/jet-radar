@@ -247,6 +247,56 @@ By utilizing these two schemas, JET-RADAR effectively manages the data flow from
 
 ## Roadmap
 
+### Phase 1: Historical Data and International Access
+
+**Objective**: Enable access to historical data and expand coverage to planes registered outside the US.
+
+**Tasks**:
+
+- Research and identify reliable sources of historical aviation data.
+- Implement data retrieval and storage mechanisms for historical data.
+- Enhance data collection processes to include planes registered outside the US.
+
+### Phase 2: Cost of Fuel Conversion
+
+**Objective**: Automate the conversion of fuel costs for enhanced analysis.
+
+**Tasks**:
+
+- Integrate with relevant fuel cost APIs or data sources.
+- Develop algorithms to convert and normalize fuel cost data.
+- Implement automated data processing to incorporate fuel cost conversion.
+
+### Phase 3: Custom Domain and Social Media Integration
+
+**Objective**: Host the dashboard on a custom domain and integrate with social media platforms.
+
+**Tasks**:
+
+- Register a custom domain and set up hosting infrastructure.
+- Configure the dashboard to be accessible via the custom domain.
+- Implement social media integration with platforms like Twitter and Facebook.
+
+### Phase 4: User Contributions
+
+**Objective**: Allow users to contribute private jet owners to the catalogue.
+
+**Tasks**:
+
+- Develop user registration and authentication mechanisms.
+- Implement a submission process for users to contribute private jet owner details.
+- Establish moderation and verification processes for user-contributed data.
+
+### Phase 5: Daily Reports and Automation
+
+**Objective**: Provide daily reports to subscribers and automate the process.
+
+**Tasks**:
+
+- Design and develop report generation functionality.
+- Implement a scheduling mechanism for automatic report generation.
+- Configure email delivery system to send reports to subscribers.
+
 ## Third-Party Services and Software
 
 <a href="https://aws.amazon.com/service-terms/"><img src="https://static-00.iconduck.com/assets.00/aws-icon-1024x1024-xh5ti9kd.png" height="100" alt="AWS Logo"></a>
