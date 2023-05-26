@@ -8,7 +8,7 @@
 /* Base Styles*/
 html {
     font-size: 50%;
-    background-color: #1f2630;
+    background-color: #2E2C2F;
     max-width: 100% !important;
     width: 100% !important;
     margin: 0;
@@ -19,13 +19,13 @@ body {
     line-height: 1.6;
     font-weight: 400;
     font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #7fafdf;
+    color: #F3E8EE;
     margin: 0;
 }
 
 #root {
     margin: 0;
-    background-color: #1f2630;
+    background-color: #2E2C2F;
     padding: 5rem;
 }
 
@@ -72,7 +72,7 @@ body {
     max-width: 100%;
 }
 #celeb-info{
-    background-color: #252e3f;
+    background-color:#475B63;
     margin-top: 2rem;
     height: 18%;
 }
@@ -87,7 +87,7 @@ body {
 
 
 #flights-tracked-container{
-    background-color: #252e3f;
+    background-color:#475B63;
     margin-top: 5rem;
     margin-bottom: 0rem;
     height: 10%;
@@ -103,7 +103,7 @@ body {
 /*Inside center column NOTE: title is covered by H4*/
 #description {
     font-size: 1.5rem;
-    border-left: #2cfec1 solid 1rem;
+    border-left: #BACDB0 solid 1rem;
     padding-left: 1rem;
     max-width: 100rem;
     margin: 2rem 0 3rem 0;
@@ -111,7 +111,7 @@ body {
 #flight-info-box {
     height:15%;
     margin-top: 2rem;
-    background-color: #252e3f;
+    background-color:#475B63;
 }
 .container {
     display: flex;
@@ -132,7 +132,7 @@ body {
 #infographic-box {
     height:7%;
     margin-top: 2rem;
-    background-color: #252e3f;
+    background-color:#475B63;
 }
 #infographic-text{
     max-width: 75%;
@@ -141,14 +141,13 @@ body {
     height:25%;
     margin-top: 2rem;
     align-content: center;
-    border: #2cfec1 solid 2px;
     position: relative;
 }
 #co2-graph-container {
     float:left;
     width: 47%;
     height:100%;
-    background-color: #252e3f;
+    background-color:#475B63;
 
 }
 #co2-graph{
@@ -158,7 +157,7 @@ body {
     float: right;
     width: 47%;
     height:100%;
-    background-color: #252e3f;
+    background-color: #475B63;
     
 }
 #cost-graph{
@@ -171,19 +170,19 @@ body {
     max-height: 40rem;
 }
 #slider-container {
-    background-color: #252e3f;
+    background-color: #475B63;
     padding: 1rem 3rem 1rem 3rem;
     height: 10%;
     margin: 2rem;
 }
 #flight-map-container {
     height:30%;
-    background-color: #252e3f;
+    background-color: #475B63;
     margin:2rem;
 }
 #graph-flights-over-time{
     height:25%;
-    background-color: #252e3f;
+    background-color: #475B63;
     margin:2rem;
 }
 #flights-vs-time-graph, #flight-map{
@@ -259,13 +258,13 @@ p {
 /* Slider colours
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .rc-slider-dot-active, .rc-slider-handle {
-    border-color: #2cfec1 !important;
+    border-color: #BACDB0 !important;
 }
 .rc-slider-track {
-    background-color: #2cfec1 !important
+    background-color: #BACDB0 !important
 }
 .rc-slider-rail {
-    background-color: #1d2731 !important
+    background-color: #475B63 !important
 }
 
 /*List styling */
@@ -280,32 +279,32 @@ ul {
 }
 
 .Select-control {
-    color: #7fafdf !important;
+    color: #BACDB0 !important;
 }
 
 .Select {
-    color: #7fafdf !important;
+    color: #BACDB0 !important;
 }
 
 .Select-menu-outer {
-    background-color: #252e3f !important;
-    border: 1px solid #7fafdf !important;
+    background-color: #475B63 !important;
+    border: 1px solid #BACDB0 !important;
 }
 
 .Select div {
-    background-color: #252e3f !important;
+    background-color: #475B63 !important;
 }
 
 .Select-menu-outer div:hover {
-    background-color: rgba(255, 255, 255, 0.01) !important;
+    background-color: #475B63 !important;
     cursor: pointer;
 }
 
 .Select-value-label {
-    color: #7fafdf !important;
+    color: #F3E8EE !important;
 }
 
 .Select--single > .Select-control .Select-value, .Select-placeholder {
-    border: 1px solid #7fafdf !important;
+    border: 1px solid #BACDB0 !important;
     border-radius: 4px !important;
 }

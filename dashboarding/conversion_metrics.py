@@ -142,7 +142,7 @@ COMPARISONS = {"co2": {"tree": [0.167, f"This flight used the same CO2 stored by
                         "beer": [0.01501, f"The volume of fuel is roughly __ pints of beer "], },
                
                "time": {"film": [1.68, f"This flight's duration equals about __ movies "],
-                        "album": [0.73, f"Instead you could've heard Taylor Swift's 'Midnights' __ times "], 
+                        "album": [0.73, f"You could've heard Taylor Swift's 'Midnights' __ times "], 
                         "football": [1.5, f"This flight took as long as __ football matches "]}}
 
 
