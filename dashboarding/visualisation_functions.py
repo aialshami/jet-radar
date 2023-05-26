@@ -3,8 +3,6 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import requests
-from pandas import DataFrame, Series
-from datetime import datetime
 from plotly.graph_objs._figure import Figure
 
 
@@ -39,7 +37,7 @@ def default_flight_fig() -> Figure:
         countrycolor=COUNTRY_LINE_COLOUR)
     return fig
 
-def number_of_flights_over_time(flights: dict[dict]) -> Figure:
+def num_of_flights_over_time(flights: dict[dict]) -> Figure:
     """ Creates a graph of which days the fly on the most """
     if flights["fuel_usage"] == {}:
         return default_empty_fig()
@@ -57,7 +55,7 @@ def number_of_flights_over_time(flights: dict[dict]) -> Figure:
 
     return fig
 
-def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
+def co2_flight_vs_avg(flight_data:dict, avg_co2:float) -> Figure:
     """ Produces figure contrasting the co2 output of 
         the previous flight to the daily average """
     celeb_name = flight_data["owner"]
@@ -69,7 +67,7 @@ def co2_of_flight_vs_average(flight_data:dict, avg_co2:float) -> Figure:
                                  plot_bgcolor='#252e3f')
     return fig
 
-def cost_of_flight_vs_average(flight_data:dict, avg_wage:float) -> Figure:
+def cost_flight_vs_avg(flight_data:dict, avg_wage:float) -> Figure:
     """ Produces figure contrasting the co2 output of 
         the previous flight to the daily average """
     celeb_name = flight_data["owner"]
