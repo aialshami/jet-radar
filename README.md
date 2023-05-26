@@ -60,7 +60,7 @@ At JET-RADAR, our purpose is to raise awareness about the carbon emissions gener
 
 To view our live Dashboard please click on the image below:
 
-[![airplane door](https://twistedsifter.com/wp-content/uploads/2022/01/Screen-Shot-2022-01-06-at-8.33.44-AM.png?w=1024)](https://www.youtube.com/watch?v=xvFZjo5PgG0)
+[![airplane door](https://twistedsifter.com/wp-content/uploads/2022/01/Screen-Shot-2022-01-06-at-8.33.44-AM.png?w=1024)](http://ec2-3-8-117-169.eu-west-2.compute.amazonaws.com:8080)
 
 Want to launch your own JET-RADAR data collection and visualisation system? Or do you want to contribute to the project? Follow the guidelines in the next sections to get started:
 
@@ -206,6 +206,22 @@ By utilizing the ADS-B Exchange API and real-time data collection, JET-RADAR pro
 
 ### The Dashboard
 
+![dashboard](./assets/dahsboard.png)
+
+In our dashboard section, we offer a user-friendly interface that provides an immersive experience into the world of celebrity private jet travel. Here's what you can expect:
+
+1. Celebrity Selection: A dropdown menu allows you to choose from a list of celebrities being tracked. Selecting a celebrity will dynamically update the dashboard to display their name, gender, estimated net worth, and other relevant information.
+
+2. Flight Details: The dashboard presents information about the celebrity's last flight. This includes data such as the origin and destination airports, flight duration, and other key flight-specific details. A slider enables you to navigate through the celebrity's flight history and explore different trips they've taken.
+
+3. CO2 Comparison: Visualize the environmental impact of private jet flights with our CO2 comparison graph. It juxtaposes the CO2 emissions of the celebrity's flight against the CO2 emissions produced by 1,000 average individuals. This provides valuable insights into the carbon footprint associated with private air travel.
+
+4. Economic Analysis: Discover the economic perspective of private jet flights with our daily median wage versus flight cost graph. This graph correlates the average daily wage with the cost of the celebrity's flight, offering an interesting comparison between personal wealth and the expenses associated with luxury air travel.
+
+5. Travel Distribution: Gain a deeper understanding of the celebrity's travel patterns with our distribution of travel days graph. This graph showcases the frequency of their travel over a given period, providing insights into their mobility and lifestyle.
+
+6. Infographics: Engage with visually captivating infographics that offer additional intriguing information and statistics about celebrity private jet travel.
+
 ## ADS-B Exchange API
 
 JET-RADAR utilizes the [**ADS-B Exchange API**](https://rapidapi.com/adsbx/api/adsbexchange-com1) to collect real-time data on private aircraft movements. This comprehensive API provides information on aircraft positions, flight numbers, and more. By integrating the ADS-B Exchange API, JET-RADAR ensures accurate and up-to-date data on private jet movements. With the ADS-B Exchange API, JET-RADAR offers a reliable platform for tracking and recording unsustainable aviation practices.
@@ -257,7 +273,6 @@ By utilizing these two schemas, JET-RADAR effectively manages the data flow from
 - Enhance data collection processes to include planes registered outside the US.
 
 ### Phase 2: Cost of Fuel Conversion
-
 **Objective**: Automate the conversion of fuel costs for enhanced analysis.
 
 **Tasks**:
