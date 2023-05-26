@@ -35,6 +35,7 @@ AVG_YEARLY_CO2_IMPACT = 4 # mtCO2: GLOBAL AVG YEARLY CO2 of 4tons * 1000 people
 
 PREVIOUS_INFOGRAPHIC = "time" # sets a default to work from
 PAST_FLIGHTS = [1, 2, 3, 4, 5]
+FOCUS_NAME='Elon Musk'
 MOST_RECENT_FLIGHTS= get_most_recent_flight_info(owner_df[owner_df["name"] == "Elon Musk"], flight_df, aircraft_df, airport_df)
 RECENT_CO2, RECENT_COST, RECENT_FUEL, RECENT_TIME = 0,0,0,0
 RECENT_DISPLAY, RECENT_TIME = get_flight_time(MOST_RECENT_FLIGHTS['dep_time'][0],MOST_RECENT_FLIGHTS['arr_time'][0])
@@ -98,9 +99,9 @@ app.layout = html.Div(
                          children=[
                             html.Div(id='map-container-vert-pad'),
                             html.Div(id='slider-container', children=[
-                                         html.P(id='slider-text', children="Move slider to see past flights"),
+                                         html.P(id='slider-text', children="Move slider for up to 5 previous flights"),
                                          dcc.Slider(id="previous-flight-slider",
-                                                    min=min(PAST_FLIGHTS), max=max(PAST_FLIGHTS), step=1,
+                                                    min=min(PAST_FLIGHTS), max=max(PAST_FLIGHTS), step=1, value=1,
                                                     marks={str(year): { "label": str(year),
                                                                        "style": {"color": "#7fafdf"},
                                                                        } for year in PAST_FLIGHTS
@@ -135,18 +136,20 @@ app.layout = html.Div(
      Output("flight-map","figure"),
      Output("flights-vs-time-graph","figure"),
     ],
-    [Input("celeb-dropdown", "value"),],
+    [Input("celeb-dropdown", "value")],
 )
 def swap_celebrity(dropdown_value:str):
     """ This is a callback for the dropdown list to pipe data into all the elements """
     #sets them to alter the global values
-    global RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME, RECENT_DISPLAY 
+    global RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME, RECENT_DISPLAY, MOST_RECENT_FLIGHTS, FOCUS_NAME
     celeb_name = " ".join([x[0].upper() + x[1:] for x in dropdown_value.split('_')])
     name, gender, age, worth = get_celeb_info(celeb_name, owner_df, gender_df)
+    FOCUS_NAME = name
     celeb_img = f"assets/celeb_photos/{dropdown_value}.jpg"
     number_of_flights_tracked = get_total_number_of_flights(celeb_name, owner_df, aircraft_df, flight_df)
     
     MOST_RECENT_FLIGHTS = get_most_recent_flight_info(owner_df[owner_df["name"] == name], flight_df, aircraft_df, airport_df)
+    
     
     # Set defaults for when we don't have flights yet
     flight_cost_string = "This flight cost - "
@@ -199,6 +202,66 @@ def swap_infographic(n_intervals) -> str:
         return get_new_infographic_text('time', RECENT_TIME)
     else:
         raise ValueError("comparison_choice should only ever be one of ['time', 'fuel', 'co2', 'cost']")
+
+@app.callback( 
+    [Output("cost-div", "children", allow_duplicate=True),
+     Output("co2-div", "children", allow_duplicate=True),
+     Output("fuel-div", "children", allow_duplicate=True),
+     Output("time-div", "children", allow_duplicate=True),
+
+     Output("co2-graph","figure", allow_duplicate=True),
+     Output("cost-graph","figure", allow_duplicate=True),
+     Output("flight-map","figure", allow_duplicate=True),
+     Output("flights-vs-time-graph","figure", allow_duplicate=True),
+    ],
+    Input("previous-flight-slider", "value"), prevent_initial_call=True
+)
+def change_flights(flight_index: int) -> str:
+    """ Change flights via slider NOTE:repeated code, clean this up """
+    flight_index -= 1
+    max_index_of_flights_available = len(list(MOST_RECENT_FLIGHTS["fuel_usage"].keys()))-1
+
+    if flight_index > max_index_of_flights_available:
+        flight_index = max_index_of_flights_available
+
+    if flight_index <= max_index_of_flights_available:
+        # Set defaults for when we don't have flights yet
+        return recalculate_flight_data(flight_index)
+        
+    return "No Data", "No Data", "No Data", "No Data", default_empty_fig(), default_empty_fig(), default_flight_fig(), default_empty_fig()
+
+
+def recalculate_flight_data(flight_index:int):
+    """ Calculates the displayed flight data """
+
+    flight_cost_string = "This flight cost - "
+    flight_co2_string = "This flight used - "
+    flight_fuel_string = "This flight used - "
+    flight_time_string = "This flight took - "
+    RECENT_COST, RECENT_CO2, RECENT_FUEL, RECENT_TIME = 0,0,0,0
+    cost_fig, co2_fig, focus_flight_fig, weekday_fig = default_empty_fig(), default_empty_fig(), default_flight_fig(), default_empty_fig()
+
+    if MOST_RECENT_FLIGHTS['fuel_usage'] != {}:
+        RECENT_COST = get_flight_cost(MOST_RECENT_FLIGHTS['fuel_usage'][flight_index])
+        RECENT_CO2 =  get_flight_co2(MOST_RECENT_FLIGHTS['fuel_usage'][flight_index])
+        RECENT_FUEL = round(MOST_RECENT_FLIGHTS['fuel_usage'][flight_index])
+        RECENT_DISPLAY, RECENT_TIME = get_flight_time(MOST_RECENT_FLIGHTS['dep_time'][flight_index],MOST_RECENT_FLIGHTS['arr_time'][flight_index])
+
+        flight_cost_string += f"${RECENT_COST}"
+        flight_co2_string += f"{RECENT_CO2} mtCO2"
+        flight_fuel_string +=f"{RECENT_FUEL} gal of fuel"
+        flight_time_string += f"{RECENT_DISPLAY}"
+        
+        cost_fig = cost_of_flight_vs_average({"owner": FOCUS_NAME, "cost": RECENT_COST, "time":RECENT_TIME}, MEDIAN_HR_WAGE)
+        co2_fig = co2_of_flight_vs_average({"owner": FOCUS_NAME, "co2": RECENT_CO2}, AVG_YEARLY_CO2_IMPACT)
+
+        lat_i, lat_j = MOST_RECENT_FLIGHTS["lat_dep_airport"][flight_index], MOST_RECENT_FLIGHTS["lat_arr_airport"][flight_index]
+        lon_i, lon_j = MOST_RECENT_FLIGHTS["lon_dep_airport"][flight_index], MOST_RECENT_FLIGHTS["lon_arr_airport"][flight_index]
+        focus_flight_fig = create_flight_map({'Location': ['Start', 'End'], 'lat': [lat_i, lat_j], 'long': [lon_i, lon_j]})
+        weekday_fig = number_of_flights_over_time(MOST_RECENT_FLIGHTS)
+
+    return flight_cost_string, flight_co2_string, flight_fuel_string, flight_time_string, co2_fig, cost_fig, focus_flight_fig, weekday_fig
+
 
 
 if __name__ == "__main__":
