@@ -34,8 +34,7 @@
       </ul>
     </li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#licenses">Licenses</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#third-party-services-and-software">Third-Party Services and Software</a></li>
   </ol>
 </details>
 <break>
@@ -241,7 +240,7 @@ The staging schema represents an unnormalised structure with a single table that
 **Production Schema**:
 The production schema employs a normalised structure to store the transformed and processed data. It consists of 11 tables that are organized to the 3rd degree of normalisation, ensuring data integrity and reducing redundancy. The tables in the production schema are designed to efficiently store and query the data for visualization and analysis. Here is an image illustrating the structure of the production schema:
 
-![production erd](https://i.ibb.co/hBFhq2c/draw-SQL-production-export-2023-05-25.png)
+![production erd](./assets/production-erd.png)
 
 By utilizing these two schemas, JET-RADAR effectively manages the data flow from extraction to transformation and provides a well-organized structure for storing and retrieving the processed data.
 
