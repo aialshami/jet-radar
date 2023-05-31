@@ -129,6 +129,7 @@ env.bak/
 venv.bak/
 .DS_Store
 DS_Store
+*.pem
 
 #Terraform
 terraform.tfvars

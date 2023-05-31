@@ -1,6 +1,0 @@
-Dockerfile
-.env
-zdocker_bash.sh
-notebook.ipynb
-c7-kyle-key.pem
-*.pem
